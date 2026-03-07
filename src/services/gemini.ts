@@ -36,14 +36,15 @@ function getClient(): GoogleGenerativeAI {
 }
 
 /**
- * Generate a 768-dimension embedding vector for the given text.
- * Uses `text-embedding-004` which natively outputs 768 dims —
- * no outputDimensionality config required, always matches vector(768) in Supabase.
+ * Generate a 3072-dimension embedding vector for the given text.
+ * Uses `gemini-embedding-001` which natively outputs 3072 dims —
+ * matches vector(3072) or halfvec(3072) in Supabase.
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
-  const model = getClient().getGenerativeModel({
-    model: RAG_CONFIG.EMBEDDING_MODEL,
-  });
+  const model = getClient().getGenerativeModel(
+    { model: RAG_CONFIG.EMBEDDING_MODEL },
+    { apiVersion: 'v1beta' }
+  );
 
   const result = await model.embedContent(text);
   return result.embedding.values;

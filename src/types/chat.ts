@@ -41,8 +41,8 @@ export const RAG_CONFIG = {
   MATCH_THRESHOLD: -1.0,
   /** Maximum number of documents to retrieve */
   MATCH_COUNT: 5,
-  /** Embedding model identifier — text-embedding-004 outputs 768 dims natively */
-  EMBEDDING_MODEL: 'text-embedding-001',
+  /** Embedding model identifier — gemini-embedding-001 supports Matryoshka (768 or 3072) in v1beta */
+  EMBEDDING_MODEL: 'gemini-embedding-001',
   /** Chat model identifier */
   CHAT_MODEL: 'gemini-3-flash-preview',
 } as const;
