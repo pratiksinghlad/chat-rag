@@ -71,6 +71,11 @@ export function ChatInput({ onSend, isDisabled }: ChatInputProps) {
           isLoading={isDisabled}
         />
       </Flex>
+      <Text color="red.500" fontSize="sm" mt={3}>
+        {"\u26A0\uFE0F"} Please avoid entering sensitive or confidential
+        information. This system uses a cloud-based LLM provider to process
+        requests.
+      </Text>
     </Box>
   );
 }

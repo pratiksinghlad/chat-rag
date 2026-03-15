@@ -1,14 +1,22 @@
 import { useRef, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   Box,
   VStack,
   Flex,
   Text,
   Icon,
   IconButton,
+  Button,
   Spinner,
   useColorModeValue,
+  useDisclosure,
   useToast,
 } from "@chakra-ui/react";
 import { useAuth } from "@/context/AuthContext";
@@ -21,16 +29,24 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 export function ChatRagPage() {
   const { user, isLoading: authLoading } = useAuth();
   const {
+    activeChatId,
     messages,
-    isLoading,
-    isInitializing,
+    isSendingMessage,
+    isSwitchingChats,
+    isDeletingChat,
     error,
     activeChatTitle,
     sendMessage,
-    clearChat,
+    deleteActiveChat,
   } = useChatRag();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const cancelDeleteRef = useRef<HTMLButtonElement>(null);
   const toast = useToast();
+  const {
+    isOpen: isDeleteDialogOpen,
+    onOpen: openDeleteDialog,
+    onClose: closeDeleteDialog,
+  } = useDisclosure();
 
   const emptyBg = useColorModeValue("gray.50", "gray.800");
   const chatBg = useColorModeValue("white", "gray.900");
@@ -38,13 +54,15 @@ export function ChatRagPage() {
   const headerBg = useColorModeValue("white", "gray.800");
   const headingColor = useColorModeValue("gray.800", "white");
   const emptyHeadingColor = useColorModeValue("gray.700", "gray.200");
+  const transitionOverlayBg = useColorModeValue(
+    "rgba(255, 255, 255, 0.72)",
+    "rgba(26, 32, 44, 0.72)"
+  );
 
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isSendingMessage]);
 
-  // Show error toast
   useEffect(() => {
     if (error) {
       toast({
@@ -58,7 +76,7 @@ export function ChatRagPage() {
     }
   }, [error, toast]);
 
-  if (authLoading || isInitializing) {
+  if (authLoading) {
     return (
       <Box
         minH="100vh"
@@ -67,9 +85,7 @@ export function ChatRagPage() {
         justifyContent="center"
         bg="white"
       >
-        <LoadingSpinner
-          message={authLoading ? "Loading..." : "Loading conversation..."}
-        />
+        <LoadingSpinner message="Loading..." />
       </Box>
     );
   }
@@ -91,7 +107,6 @@ export function ChatRagPage() {
         overflow="hidden"
         boxShadow={{ base: "none", md: "lg" }}
       >
-        {/* Chat header */}
         <Flex
           align="center"
           justify="space-between"
@@ -111,28 +126,22 @@ export function ChatRagPage() {
               </Icon>
             </Box>
             <Box>
-              <Text
-                fontWeight="bold"
-                fontSize="md"
-                color={headingColor}
-              >
+              <Text fontWeight="bold" fontSize="md" color={headingColor}>
                 {activeChatTitle ?? "Chat RAG"}
               </Text>
               <Text fontSize="xs" color="gray.500">
                 AI-powered knowledge assistant
               </Text>
-              <Text color="red.500" fontSize="sm" mt={3}>
-              ⚠️ Please avoid entering sensitive or confidential information. This system uses a cloud-based LLM provider to process requests.
-              </Text>
             </Box>
           </Flex>
 
-          {messages.length > 0 && (
+          {activeChatId ? (
             <IconButton
-              aria-label="Clear chat"
+              aria-label="Delete chat"
               variant="ghost"
               size="sm"
-              onClick={clearChat}
+              onClick={openDeleteDialog}
+              isLoading={isDeletingChat}
               icon={
                 <Icon viewBox="0 0 24 24" boxSize={4}>
                   <path
@@ -142,11 +151,38 @@ export function ChatRagPage() {
                 </Icon>
               }
             />
-          )}
+          ) : null}
         </Flex>
 
-        {/* Messages area */}
-        <Box flex="1" overflowY="auto" px={4} py={4}>
+        <Box
+          flex="1"
+          overflowY="auto"
+          px={4}
+          py={4}
+          position="relative"
+          transition="opacity 0.2s ease"
+          opacity={isSwitchingChats ? 0.72 : 1}
+        >
+          {isSwitchingChats ? (
+            <Flex
+              position="absolute"
+              inset={4}
+              align="center"
+              justify="center"
+              bg={transitionOverlayBg}
+              borderRadius="xl"
+              zIndex={1}
+              pointerEvents="none"
+            >
+              <Flex align="center" gap={2}>
+                <Spinner size="sm" color="blue.400" />
+                <Text fontSize="sm" color="gray.500">
+                  Loading conversation...
+                </Text>
+              </Flex>
+            </Flex>
+          ) : null}
+
           {messages.length === 0 ? (
             <Flex
               direction="column"
@@ -191,24 +227,60 @@ export function ChatRagPage() {
                 <ChatMessageBubble key={msg.id} message={msg} />
               ))}
 
-              {/* Typing indicator */}
-              {isLoading && (
+              {isSendingMessage ? (
                 <Flex align="center" gap={2} px={2}>
                   <Spinner size="xs" color="blue.400" />
                   <Text fontSize="sm" color="gray.500">
                     Thinking...
                   </Text>
                 </Flex>
-              )}
+              ) : null}
 
               <div ref={messagesEndRef} />
             </VStack>
           )}
         </Box>
 
-        {/* Input area */}
-        <ChatInput onSend={sendMessage} isDisabled={isLoading} />
+        <ChatInput
+          onSend={sendMessage}
+          isDisabled={isSendingMessage || isDeletingChat}
+        />
       </Flex>
+
+      <AlertDialog
+        isOpen={isDeleteDialogOpen}
+        leastDestructiveRef={cancelDeleteRef}
+        onClose={closeDeleteDialog}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete chat
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              This permanently deletes the selected conversation from Supabase.
+              This action cannot be undone.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelDeleteRef} onClick={closeDeleteDialog}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={() => {
+                  void deleteActiveChat().finally(closeDeleteDialog);
+                }}
+                ml={3}
+                isLoading={isDeletingChat}
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </AppShell>
   );
 }

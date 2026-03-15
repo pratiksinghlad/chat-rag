@@ -112,6 +112,19 @@ export class SupabaseChatHistoryRepository implements ChatHistoryRepository {
 
     return mapChatSessionRow(data);
   }
+
+  async deleteChat(chatId: string): Promise<void> {
+    const { error } = await supabase
+      .from('chat_sessions')
+      .delete()
+      .eq('id', chatId);
+
+    if (error) {
+      throw new ChatHistoryError('Failed to delete the chat session.', {
+        cause: error,
+      });
+    }
+  }
 }
 
 function mapChatSessionRow(row: {

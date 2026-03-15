@@ -43,4 +43,5 @@ export interface ChatHistoryRepository {
     chatId: string,
     messages: StoredChatMessage[]
   ): Promise<ChatSessionDetail>;
+  deleteChat(chatId: string): Promise<void>;
 }

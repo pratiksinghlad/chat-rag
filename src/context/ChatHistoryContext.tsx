@@ -1,5 +1,6 @@
 import {
   createContext,
+  startTransition,
   useCallback,
   useContext,
   useEffect,
@@ -15,6 +16,7 @@ import type {
   ChatSessionSummary,
   StoredChatMessage,
 } from '@/services/chat-history/types';
+import { summarizeChatSession } from '@/services/chat-history/utils';
 
 const CHAT_HISTORY_PAGE_SIZE = 10;
 const chatHistoryRepository: ChatHistoryRepository =
@@ -39,6 +41,7 @@ interface ChatHistoryContextValue {
     chatId: string,
     messages: StoredChatMessage[]
   ) => Promise<ChatSessionDetail>;
+  deleteChat: (chatId: string) => Promise<void>;
 }
 
 const ChatHistoryContext = createContext<ChatHistoryContextValue | undefined>(
@@ -148,10 +151,15 @@ export function ChatHistoryProvider({ children }: { children: ReactNode }) {
         firstMessage: input.firstMessage,
       });
 
-      await refreshChats();
+      startTransition(() => {
+        setChats((currentChats) => [
+          summarizeChatSession(createdChat),
+          ...currentChats.filter((chat) => chat.id !== createdChat.id),
+        ]);
+      });
       return createdChat;
     },
-    [refreshChats, userEmail]
+    [userEmail]
   );
 
   const appendMessages = useCallback(
@@ -161,11 +169,26 @@ export function ChatHistoryProvider({ children }: { children: ReactNode }) {
         messages
       );
 
-      await refreshChats();
+      startTransition(() => {
+        const updatedSummary = summarizeChatSession(updatedChat);
+        setChats((currentChats) => [
+          updatedSummary,
+          ...currentChats.filter((chat) => chat.id !== chatId),
+        ]);
+      });
       return updatedChat;
     },
-    [refreshChats]
+    []
   );
+
+  const deleteChat = useCallback(async (chatId: string) => {
+    await chatHistoryRepository.deleteChat(chatId);
+    startTransition(() => {
+      setChats((currentChats) =>
+        currentChats.filter((chat) => chat.id !== chatId)
+      );
+    });
+  }, []);
 
   useEffect(() => {
     void refreshChats();
@@ -186,6 +209,7 @@ export function ChatHistoryProvider({ children }: { children: ReactNode }) {
         getChatById,
         createChat,
         appendMessages,
+        deleteChat,
       }}
     >
       {children}
