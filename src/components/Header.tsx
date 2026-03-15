@@ -45,7 +45,7 @@ export function Header() {
           />
         </Icon>
         <Text fontSize="xl" fontWeight="bold" color="gray.800">
-          SSO App
+          Chat Rag Web
         </Text>
       </HStack>
 

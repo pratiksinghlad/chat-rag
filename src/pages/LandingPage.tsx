@@ -89,9 +89,6 @@ export function LandingPage() {
               <Heading as="h1" size="2xl" color="gray.900">
                 Chat RAG Web
               </Heading>
-              <Text fontSize="xl" color="gray.600">
-                Secure single sign-on with your favorite providers
-              </Text>
             </VStack>
           </VStack>
 

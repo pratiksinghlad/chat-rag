@@ -56,7 +56,7 @@ Run the following SQL in the Supabase SQL editor to create the persisted chat hi
 create extension if not exists pg_trgm;
 
 create table if not exists public.chat_sessions (
-  id uuid primary key default uuidv7(),
+  id uuid primary key default gen_random_uuid(),
   "createdBy" text not null,
   title text not null,
   "creationDate" timestamptz not null default now(),
@@ -127,4 +127,4 @@ The app runs on `http://localhost:5173` by default.
 
 - Chat history requires authenticated users with an email claim.
 - The warning beneath the chat input is intentional: prompts are sent to a cloud or local LLM provider depending on your selected configuration.
-- The SQL above assumes your Supabase/Postgres version supports `uuidv7()` as requested.
+- The SQL above assumes your Supabase/Postgres version supports `uuid` as requested.
