@@ -5,6 +5,7 @@
  * Displays OAuth sign-in buttons for Microsoft, Google, and GitHub.
  */
 
+import type { ReactElement } from "react";
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import {
@@ -220,7 +221,7 @@ function Feature({
   title,
   text,
 }: {
-  icon: any;
+  icon: ReactElement;
   title: string;
   text: string;
 }) {

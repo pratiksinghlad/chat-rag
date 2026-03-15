@@ -5,8 +5,9 @@
  * Includes provider-specific icons and styling.
  */
 
+import type { ReactElement } from "react";
 import type { OAuthProvider } from "@/types/auth";
-import { Button, Icon, Box } from "@chakra-ui/react";
+import { Button, Icon, Box, type ButtonProps } from "@chakra-ui/react";
 
 interface OAuthButtonProps {
   /** OAuth provider to sign in with */
@@ -24,11 +25,11 @@ const providerConfig: Record<
   OAuthProvider,
   {
     name: string;
-    icon: any;
+    icon: ReactElement;
     colorScheme: string;
     bg?: string;
     color?: string;
-    _hover?: any;
+    _hover?: ButtonProps["_hover"];
   }
 > = {
   google: {

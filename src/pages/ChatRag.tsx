@@ -26,6 +26,10 @@ export function ChatRag() {
 
   const emptyBg = useColorModeValue("gray.50", "gray.800");
   const chatBg = useColorModeValue("white", "gray.900");
+  const headerBorderColor = useColorModeValue("gray.200", "gray.700");
+  const headerBg = useColorModeValue("white", "gray.800");
+  const headingColor = useColorModeValue("gray.800", "white");
+  const emptyHeadingColor = useColorModeValue("gray.700", "gray.200");
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -84,8 +88,8 @@ export function ChatRag() {
           px={5}
           py={3}
           borderBottom="1px"
-          borderColor={useColorModeValue("gray.200", "gray.700")}
-          bg={useColorModeValue("white", "gray.800")}
+          borderColor={headerBorderColor}
+          bg={headerBg}
         >
           <Flex align="center" gap={3}>
             <Box p={2} bg="blue.50" borderRadius="lg" color="blue.500">
@@ -100,7 +104,7 @@ export function ChatRag() {
               <Text
                 fontWeight="bold"
                 fontSize="md"
-                color={useColorModeValue("gray.800", "white")}
+                color={headingColor}
               >
                 Chat RAG
               </Text>
@@ -158,7 +162,7 @@ export function ChatRag() {
               <Text
                 fontSize="xl"
                 fontWeight="bold"
-                color={useColorModeValue("gray.700", "gray.200")}
+                color={emptyHeadingColor}
                 mb={2}
               >
                 Start a conversation
