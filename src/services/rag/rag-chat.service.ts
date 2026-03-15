@@ -20,6 +20,8 @@ export class RagChatService implements IChatService {
       embedding
     );
 
+    const isGrounded = contextDocuments.length > 0;
+
     const response = await this.providerChatService.getChatResponse({
       ...input,
       systemInstruction: buildSystemInstruction(contextDocuments),
@@ -28,6 +30,7 @@ export class RagChatService implements IChatService {
     return {
       ...response,
       contextDocuments,
+      isGrounded,
     };
   }
 }
@@ -36,8 +39,8 @@ function buildSystemInstruction(contextDocuments: RetrievedDocument[]): string {
   if (contextDocuments.length === 0) {
     return [
       'You are a helpful AI assistant.',
-      'No relevant knowledge base context was retrieved.',
-      'Answer carefully and be honest when you are uncertain.',
+      'Answer the user question accurately using your general knowledge.',
+      'Be concise and professional.',
     ].join('\n');
   }
 
@@ -49,9 +52,12 @@ function buildSystemInstruction(contextDocuments: RetrievedDocument[]): string {
     .join('\n\n');
 
   return [
-    'You are a helpful AI assistant with access to retrieved knowledge base context.',
-    'Use the context below when it is relevant to the user question.',
-    'If the context is not sufficient, say so clearly instead of inventing facts.',
+    'You are a highly precise AI assistant. Your primary goal is to answer the user question using ONLY the provided retrieved context below.',
+    'STRICT RULES:',
+    '1. Use the "RETRIEVED CONTEXT" section to answer.',
+    '2. If the answer is not explicitly contained within the context, state: "I am sorry, but I do not have enough specific information in my knowledge base to answer that question accurately."',
+    '3. Do not invent facts or use your internal knowledge to supplement missing information if it contradicts the goal of being grounded in the data.',
+    '4. Maintain a professional and helpful tone.',
     '',
     '--- RETRIEVED CONTEXT ---',
     formattedContext,

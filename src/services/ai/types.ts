@@ -27,6 +27,7 @@ export interface ChatResponse {
   text: string;
   provider: AIProvider;
   contextDocuments?: RetrievedDocument[];
+  isGrounded: boolean;
 }
 
 export interface IChatService {

@@ -5,6 +5,7 @@ export interface ChatMessage {
   role: 'user' | 'assistant' | 'error';
   content: string;
   timestamp: Date;
+  isGrounded?: boolean;
 }
 
 export type ChatContextDocument = RetrievedDocument;

@@ -136,7 +136,8 @@ export function useChatRag(): UseChatRagReturn {
 
         const assistantMessage = createStoredChatMessage(
           'assistant',
-          response.text
+          response.text,
+          response.isGrounded
         );
         const updatedSession = await appendMessages(session.id, [
           assistantMessage,

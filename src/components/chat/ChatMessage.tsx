@@ -1,4 +1,5 @@
-import { Box, Flex, Text, useColorModeValue } from "@chakra-ui/react";
+import { Box, Flex, Text, useColorModeValue, Tag, TagLabel } from "@chakra-ui/react";
+// import { FiDatabase, FiCpu } from "react-icons/fi";
 import type { ChatMessage as ChatMessageType } from "@/types/chat";
 
 interface ChatMessageProps {
@@ -28,6 +29,21 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
         boxShadow="sm"
         position="relative"
       >
+        {!isUser && !isError && (
+          <Box mt={3} pt={2}>
+            {message.isGrounded ? (
+              <Tag size="sm" variant="subtle" colorScheme="green" borderRadius="full" px={2}>
+                {/* <Icon as={FiDatabase} mr={1} /> */}
+                <TagLabel fontWeight="medium">from knowledge base</TagLabel>
+              </Tag>
+            ) : (
+              <Tag size="sm" variant="subtle" colorScheme="red" borderRadius="full" px={2}>
+                {/* <Icon as={FiCpu} mr={1} /> */}
+                <TagLabel fontWeight="medium">not from knowledge base</TagLabel>
+              </Tag>
+            )}
+          </Box>
+        )}
         <Text
           fontSize="sm"
           whiteSpace="pre-wrap"
@@ -36,6 +52,7 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
         >
           {message.content}
         </Text>
+        
         <Text
           fontSize="xs"
           opacity={0.6}

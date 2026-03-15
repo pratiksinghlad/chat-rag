@@ -3,6 +3,7 @@ export interface StoredChatMessage {
   role: 'user' | 'assistant' | 'error';
   content: string;
   timestamp: string;
+  isGrounded?: boolean;
 }
 
 export interface ChatSessionSummary {
