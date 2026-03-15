@@ -6,9 +6,43 @@
  * npx supabase gen types typescript --project-id YOUR_PROJECT_ID > src/types/database.ts
  */
 
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
+
 export interface Database {
   public: {
     Tables: {
+      chat_sessions: {
+        Row: {
+          id: string;
+          createdBy: string;
+          title: string;
+          creationDate: string;
+          lastActivityDate: string;
+          messages: Json;
+        };
+        Insert: {
+          id?: string;
+          createdBy: string;
+          title: string;
+          creationDate?: string;
+          lastActivityDate?: string;
+          messages?: Json;
+        };
+        Update: {
+          createdBy?: string;
+          title?: string;
+          creationDate?: string;
+          lastActivityDate?: string;
+          messages?: Json;
+        };
+        Relationships: [];
+      };
       documents: {
         Row: {
           id: string;
@@ -29,6 +63,7 @@ export interface Database {
           metadata?: Record<string, string>;
           embedding?: number[];
         };
+        Relationships: [];
       };
     };
     Views: Record<string, never>;

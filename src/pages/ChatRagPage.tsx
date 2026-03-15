@@ -20,7 +20,15 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 
 export function ChatRagPage() {
   const { user, isLoading: authLoading } = useAuth();
-  const { messages, isLoading, error, sendMessage, clearChat } = useChatRag();
+  const {
+    messages,
+    isLoading,
+    isInitializing,
+    error,
+    activeChatTitle,
+    sendMessage,
+    clearChat,
+  } = useChatRag();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const toast = useToast();
 
@@ -50,7 +58,7 @@ export function ChatRagPage() {
     }
   }, [error, toast]);
 
-  if (authLoading) {
+  if (authLoading || isInitializing) {
     return (
       <Box
         minH="100vh"
@@ -59,7 +67,9 @@ export function ChatRagPage() {
         justifyContent="center"
         bg="white"
       >
-        <LoadingSpinner message="Loading..." />
+        <LoadingSpinner
+          message={authLoading ? "Loading..." : "Loading conversation..."}
+        />
       </Box>
     );
   }
@@ -106,10 +116,13 @@ export function ChatRagPage() {
                 fontSize="md"
                 color={headingColor}
               >
-                Chat RAG
+                {activeChatTitle ?? "Chat RAG"}
               </Text>
               <Text fontSize="xs" color="gray.500">
                 AI-powered knowledge assistant
+              </Text>
+              <Text color="red.500" fontSize="sm" mt={3}>
+              ⚠️ Please avoid entering sensitive or confidential information. This system uses a cloud-based LLM provider to process requests.
               </Text>
             </Box>
           </Flex>

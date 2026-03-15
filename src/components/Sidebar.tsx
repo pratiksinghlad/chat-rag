@@ -1,10 +1,36 @@
-import { Box, VStack, Button, Icon, useColorModeValue } from "@chakra-ui/react";
-import { Link, useLocation } from "react-router-dom";
+import {
+  Box,
+  VStack,
+  Button,
+  Icon,
+  Input,
+  Spinner,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useChatHistory } from "@/context/ChatHistoryContext";
 
 export function Sidebar() {
   const bg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
+  const listItemBg = useColorModeValue("gray.50", "gray.700");
+  const listItemHoverBg = useColorModeValue("gray.100", "gray.600");
   const location = useLocation();
+  const navigate = useNavigate();
+  const {
+    chats,
+    searchQuery,
+    hasMore,
+    isLoadingChats,
+    isLoadingMore,
+    error,
+    setSearchQuery,
+    loadMoreChats,
+  } = useChatHistory();
+  const activeChatId = location.pathname.startsWith("/chat/")
+    ? location.pathname.split("/").at(-1) ?? null
+    : null;
 
   return (
     <Box
@@ -22,7 +48,7 @@ export function Sidebar() {
           icon="chat"
           label="Chat"
           to="/chat"
-          isActive={location.pathname === "/chat"}
+          isActive={location.pathname.startsWith("/chat")}
         />
         <NavItem
           icon="profile"
@@ -45,6 +71,71 @@ export function Sidebar() {
           isActive={false}
           isDisabled
         />
+        <Box h="px" bg={borderColor} my={2} />
+        <Button
+          colorScheme="blue"
+          variant="outline"
+          onClick={() => navigate("/chat")}
+        >
+          New chat
+        </Button>
+        <Input
+          placeholder="Search chats"
+          size="sm"
+          value={searchQuery}
+          onChange={(event) => setSearchQuery(event.target.value)}
+        />
+        <Text fontSize="xs" fontWeight="semibold" color="gray.500" px={1}>
+          Recent chats
+        </Text>
+        {isLoadingChats ? (
+          <Box py={4} textAlign="center">
+            <Spinner size="sm" color="blue.400" />
+          </Box>
+        ) : null}
+        {error ? (
+          <Text fontSize="xs" color="red.500" px={1}>
+            {error}
+          </Text>
+        ) : null}
+        {!isLoadingChats && chats.length === 0 ? (
+          <Text fontSize="sm" color="gray.500" px={1}>
+            No chats found yet.
+          </Text>
+        ) : null}
+        {chats.map((chat) => (
+          <Button
+            key={chat.id}
+            justifyContent="flex-start"
+            variant="ghost"
+            h="auto"
+            minH="56px"
+            py={3}
+            px={3}
+            bg={chat.id === activeChatId ? listItemBg : "transparent"}
+            _hover={{ bg: listItemHoverBg }}
+            onClick={() => navigate(`/chat/${chat.id}`)}
+          >
+            <Box textAlign="left" w="full" overflow="hidden">
+              <Text fontSize="sm" fontWeight="medium" noOfLines={1}>
+                {chat.title}
+              </Text>
+              <Text fontSize="xs" color="gray.500">
+                {formatChatTimestamp(chat.lastActivityDate)}
+              </Text>
+            </Box>
+          </Button>
+        ))}
+        {hasMore ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => void loadMoreChats()}
+            isLoading={isLoadingMore}
+          >
+            Load more
+          </Button>
+        ) : null}
       </VStack>
     </Box>
   );
@@ -129,3 +220,13 @@ function NavItem({
 }
 
 export default Sidebar;
+
+function formatChatTimestamp(value: string): string {
+  const date = new Date(value);
+  return date.toLocaleString([], {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
