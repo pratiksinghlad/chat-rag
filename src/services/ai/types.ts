@@ -1,3 +1,5 @@
+import type { ChatMode } from '@/services/ai/chat-mode';
+
 export type AIProvider = 'gemini' | 'ollama';
 
 export interface ChatHistoryMessage {
@@ -21,6 +23,7 @@ export interface ChatRequest {
   message: string;
   history?: ChatHistoryMessage[];
   systemInstruction?: string;
+  mode?: ChatMode;
 }
 
 export interface ChatResponse {

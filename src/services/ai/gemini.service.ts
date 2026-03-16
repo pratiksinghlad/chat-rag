@@ -71,6 +71,7 @@ export class GeminiChatService
       return {
         text,
         provider: 'gemini',
+        isGrounded: false,
       };
     } catch (error) {
       if (

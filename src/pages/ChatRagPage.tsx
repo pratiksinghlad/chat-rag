@@ -18,6 +18,7 @@ import {
   useColorModeValue,
   useDisclosure,
   useToast,
+  Badge,
 } from "@chakra-ui/react";
 import { useAuth } from "@/context/AuthContext";
 import { useChatRag } from "@/hooks/useChatRag";
@@ -25,6 +26,10 @@ import AppShell from "@/components/AppShell";
 import ChatMessageBubble from "@/components/chat/ChatMessage";
 import ChatInput from "@/components/chat/ChatInput";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { motion, AnimatePresence } from "framer-motion";
+
+const MotionBox = motion(Box);
+const MotionFlex = motion(Flex);
 
 export function ChatRagPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -48,15 +53,15 @@ export function ChatRagPage() {
     onClose: closeDeleteDialog,
   } = useDisclosure();
 
-  const emptyBg = useColorModeValue("gray.50", "gray.800");
+  const emptyBg = useColorModeValue("white", "gray.900");
   const chatBg = useColorModeValue("white", "gray.900");
-  const headerBorderColor = useColorModeValue("gray.200", "gray.700");
-  const headerBg = useColorModeValue("white", "gray.800");
+  const headerBorderColor = useColorModeValue("gray.100", "gray.700");
+  const headerBg = useColorModeValue("white", "gray.900");
   const headingColor = useColorModeValue("gray.800", "white");
   const emptyHeadingColor = useColorModeValue("gray.700", "gray.200");
   const transitionOverlayBg = useColorModeValue(
-    "rgba(255, 255, 255, 0.72)",
-    "rgba(26, 32, 44, 0.72)"
+    "rgba(255, 255, 255, 0.8)",
+    "rgba(10, 10, 10, 0.8)"
   );
 
   useEffect(() => {
@@ -98,184 +103,255 @@ export function ChatRagPage() {
     <AppShell>
       <Flex
         direction="column"
-        h="calc(100vh - 72px)"
-        maxW="container.lg"
-        mx="auto"
+        h="full"
         w="100%"
         bg={chatBg}
-        borderRadius={{ base: "none", md: "xl" }}
+        borderRadius={{ base: "none", md: "2xl" }}
         overflow="hidden"
-        boxShadow={{ base: "none", md: "lg" }}
+        boxShadow={{ base: "none", md: "xl" }}
+        borderWidth={{ base: "0", md: "1px" }}
+        borderColor={headerBorderColor}
+        position="relative"
       >
         <Flex
           align="center"
           justify="space-between"
-          px={5}
-          py={3}
+          px={{ base: 4, md: 6 }}
+          py={4}
           borderBottom="1px"
           borderColor={headerBorderColor}
           bg={headerBg}
+          zIndex={5}
         >
           <Flex align="center" gap={3}>
-            <Box p={2} bg="blue.50" borderRadius="lg" color="blue.500">
+            <Box 
+              p={2.5} 
+              bg={useColorModeValue("blue.50", "rgba(66, 153, 225, 0.1)")} 
+              borderRadius="xl" 
+              color="blue.500"
+              display={{ base: "none", sm: "block" }}
+            >
               <Icon viewBox="0 0 24 24" boxSize={5}>
                 <path
                   fill="currentColor"
-                  d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"
+                  d="M21 15c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-2V3c0-1.1-.9-2-2-2H7c-1.1 0-2 .9-2 2v2H3c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h2v4l4-4h4l4 4v-4h2zm-4-3l-4 4h-4l-4 4v-4H5V7h14v5z"
                 />
               </Icon>
             </Box>
             <Box>
-              <Text fontWeight="bold" fontSize="md" color={headingColor}>
-                {activeChatTitle ?? "Chat RAG"}
-              </Text>
-              <Text fontSize="xs" color="gray.500">
-                AI-powered knowledge assistant
+              <Flex align="center" gap={2}>
+                <Text fontWeight="bold" fontSize="lg" color={headingColor} noOfLines={1}>
+                  {activeChatTitle ?? "New Conversation"}
+                </Text>
+                {activeChatId && (
+                  <Badge colorScheme="blue" variant="subtle" borderRadius="full" px={2}>
+                    Active
+                  </Badge>
+                )}
+              </Flex>
+              <Text fontSize="xs" color="gray.500" fontWeight="medium">
+                AI Knowledge Assistant
               </Text>
             </Box>
           </Flex>
 
-          {activeChatId ? (
-            <IconButton
-              aria-label="Delete chat"
-              variant="ghost"
-              size="sm"
-              onClick={openDeleteDialog}
-              isLoading={isDeletingChat}
-              icon={
-                <Icon viewBox="0 0 24 24" boxSize={4}>
-                  <path
-                    fill="currentColor"
-                    d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"
-                  />
-                </Icon>
-              }
-            />
-          ) : null}
+          <Flex align="center" gap={2}>
+            {activeChatId ? (
+              <IconButton
+                aria-label="Delete chat"
+                variant="ghost"
+                size="md"
+                onClick={openDeleteDialog}
+                isLoading={isDeletingChat}
+                borderRadius="xl"
+                icon={
+                  <Icon viewBox="0 0 24 24" boxSize={4}>
+                    <path
+                      fill="currentColor"
+                      d="M16 9v10H8V9h8m-1.5-6h-5l-1 1H5v2h14V4h-3.5l-1-1zM18 7H6v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7z"
+                    />
+                  </Icon>
+                }
+                _hover={{ bg: "red.50", color: "red.500" }}
+              />
+            ) : null}
+          </Flex>
         </Flex>
 
         <Box
           flex="1"
-          overflowY="auto"
-          px={4}
-          py={4}
+          minH={0}
           position="relative"
-          transition="opacity 0.2s ease"
-          opacity={isSwitchingChats ? 0.72 : 1}
+          bg={emptyBg}
         >
-          {isSwitchingChats ? (
-            <Flex
-              position="absolute"
-              inset={4}
-              align="center"
-              justify="center"
-              bg={transitionOverlayBg}
-              borderRadius="xl"
-              zIndex={1}
-              pointerEvents="none"
-            >
-              <Flex align="center" gap={2}>
-                <Spinner size="sm" color="blue.400" />
-                <Text fontSize="sm" color="gray.500">
-                  Loading conversation...
-                </Text>
-              </Flex>
-            </Flex>
-          ) : null}
-
-          {messages.length === 0 ? (
-            <Flex
-              direction="column"
-              align="center"
-              justify="center"
-              h="100%"
-              bg={emptyBg}
-              borderRadius="xl"
-              p={8}
-              textAlign="center"
-            >
-              <Box
-                p={4}
-                bg="blue.50"
-                borderRadius="full"
-                color="blue.400"
-                mb={4}
+          <AnimatePresence>
+            {isSwitchingChats && (
+              <MotionFlex
+                position="absolute"
+                inset={0}
+                align="center"
+                justify="center"
+                bg={transitionOverlayBg}
+                zIndex={10}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
               >
-                <Icon viewBox="0 0 24 24" boxSize={10}>
-                  <path
-                    fill="currentColor"
-                    d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"
-                  />
-                </Icon>
-              </Box>
-              <Text
-                fontSize="xl"
-                fontWeight="bold"
-                color={emptyHeadingColor}
-                mb={2}
-              >
-                Start a conversation
-              </Text>
-              <Text color="gray.500" maxW="sm">
-                Ask me anything! I use your knowledge base to give you accurate,
-                context-aware answers.
-              </Text>
-            </Flex>
-          ) : (
-            <VStack spacing={4} align="stretch">
-              {messages.map((msg) => (
-                <ChatMessageBubble key={msg.id} message={msg} />
-              ))}
-
-              {isSendingMessage ? (
-                <Flex align="center" gap={2} px={2}>
-                  <Spinner size="xs" color="blue.400" />
-                  <Text fontSize="sm" color="gray.500">
-                    Thinking...
+                <VStack spacing={4}>
+                  <Spinner size="lg" thickness="3px" color="blue.500" emptyColor="gray.200" />
+                  <Text fontWeight="medium" color="gray.600">
+                    Syncing conversation...
                   </Text>
-                </Flex>
-              ) : null}
+                </VStack>
+              </MotionFlex>
+            )}
+          </AnimatePresence>
 
-              <div ref={messagesEndRef} />
-            </VStack>
-          )}
+          <Box
+            h="full"
+            overflowY="auto"
+            px={{ base: 4, md: 6, lg: 8 }}
+            py={{ base: 6, md: 8 }}
+            css={{
+              "&::-webkit-scrollbar": { width: "6px" },
+              "&::-webkit-scrollbar-track": { background: "transparent" },
+              "&::-webkit-scrollbar-thumb": { 
+                background: useColorModeValue("#E2E8F0", "#2D3748"),
+                borderRadius: "10px" 
+              },
+            }}
+          >
+            {messages.length === 0 ? (
+              <MotionBox
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                h="full"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <VStack spacing={6} maxW="2xl" mx="auto" textAlign="center" p={8}>
+                  <Box
+                    p={6}
+                    bg={useColorModeValue("blue.50", "rgba(66, 153, 225, 0.1)")}
+                    borderRadius="3xl"
+                    color="blue.500"
+                    boxShadow="inner"
+                  >
+                    <Icon viewBox="0 0 24 24" boxSize={12}>
+                      <path
+                        fill="currentColor"
+                        d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12zm-9-4h2v2h-2zm0-6h2v4h-2z"
+                      />
+                    </Icon>
+                  </Box>
+                  <Box>
+                    <Text
+                      fontSize={{ base: "2xl", md: "3xl" }}
+                      fontWeight="bold"
+                      color={emptyHeadingColor}
+                      mb={3}
+                      letterSpacing="tight"
+                    >
+                      How can I help you today?
+                    </Text>
+                    <Text color="gray.500" fontSize="lg" lineHeight="tall" maxW="md" mx="auto">
+                      Ask about your documentation, project specs, or start a general brainstorming session.
+                    </Text>
+                  </Box>
+                  <Flex gap={3} flexWrap="wrap" justify="center">
+                    {["Summarize our project", "Check technical specs", "Write a proposal"].map((suggestion) => (
+                      <Button
+                        key={suggestion}
+                        size="sm"
+                        variant="outline"
+                        borderRadius="full"
+                        onClick={() => sendMessage({ message: suggestion, mode: "all" })}
+                        _hover={{ bg: "blue.50", borderColor: "blue.200", color: "blue.600" }}
+                      >
+                        {suggestion}
+                      </Button>
+                    ))}
+                  </Flex>
+                </VStack>
+              </MotionBox>
+            ) : (
+              <VStack spacing={6} align="stretch" maxW="4xl" mx="auto" pb={4}>
+                {messages.map((msg) => (
+                  <ChatMessageBubble key={msg.id} message={msg} />
+                ))}
+
+                {isSendingMessage ? (
+                  <Flex align="center" gap={3} px={4} py={3}>
+                    <Box position="relative" display="flex" alignItems="center" justifyContent="center">
+                      <Spinner size="xs" color="blue.500" thickness="2px" />
+                      <Box 
+                        as={motion.div}
+                        position="absolute"
+                        w="full"
+                        h="full"
+                        borderRadius="full"
+                        border="2px solid"
+                        borderColor="blue.200"
+                        animate={{ scale: [1, 1.5], opacity: [0.5, 0] }}
+                        transition={{ duration: 1, repeat: Infinity } as any}
+                      />
+                    </Box>
+                    <Text fontSize="sm" color="gray.500" fontWeight="medium" letterSpacing="wide">
+                      NEURAL ENGINE THINKING...
+                    </Text>
+                  </Flex>
+                ) : null}
+
+                <div ref={messagesEndRef} />
+              </VStack>
+            )}
+          </Box>
         </Box>
 
-        <ChatInput
-          onSend={sendMessage}
-          isDisabled={isSendingMessage || isDeletingChat}
-        />
+        <Box 
+          px={{ base: 0, md: 4 }} 
+          pb={{ base: 0, md: 4 }} 
+          bg={chatBg}
+        >
+          <ChatInput
+            onSend={sendMessage}
+            isDisabled={isSendingMessage || isDeletingChat}
+          />
+        </Box>
       </Flex>
 
       <AlertDialog
         isOpen={isDeleteDialogOpen}
         leastDestructiveRef={cancelDeleteRef}
         onClose={closeDeleteDialog}
+        isCentered
       >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Delete chat
+        <AlertDialogOverlay backdropFilter="blur(4px)" bg="blackAlpha.600">
+          <AlertDialogContent borderRadius="2xl" p={2}>
+            <AlertDialogHeader fontSize="xl" fontWeight="bold">
+              Delete Conversation
             </AlertDialogHeader>
 
-            <AlertDialogBody>
-              This permanently deletes the selected conversation from Supabase.
-              This action cannot be undone.
+            <AlertDialogBody color="gray.600">
+              Are you sure? This will permanently remove this chat and all its history. This action cannot be undone.
             </AlertDialogBody>
 
-            <AlertDialogFooter>
-              <Button ref={cancelDeleteRef} onClick={closeDeleteDialog}>
-                Cancel
+            <AlertDialogFooter gap={3}>
+              <Button ref={cancelDeleteRef} onClick={closeDeleteDialog} variant="ghost" borderRadius="xl">
+                Keep Chat
               </Button>
               <Button
                 colorScheme="red"
+                borderRadius="xl"
                 onClick={() => {
                   void deleteActiveChat().finally(closeDeleteDialog);
                 }}
-                ml={3}
                 isLoading={isDeletingChat}
+                px={6}
               >
-                Delete
+                Delete Permanently
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

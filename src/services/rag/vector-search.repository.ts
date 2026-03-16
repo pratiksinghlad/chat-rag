@@ -39,14 +39,16 @@ export class SupabaseVectorSearchRepository
       return [];
     }
 
-    return data.map((row) => ({
-      id: String(row.id ?? ''),
-      content: String(row.content ?? ''),
-      metadata:
-        row.metadata && typeof row.metadata === 'object'
-          ? (row.metadata as Record<string, unknown>)
-          : {},
-      similarity: Number(row.similarity ?? 0),
-    }));
+    return data
+      .map((row) => ({
+        id: String(row.id ?? ''),
+        content: String(row.content ?? '').trim(),
+        metadata:
+          row.metadata && typeof row.metadata === 'object'
+            ? (row.metadata as Record<string, unknown>)
+            : {},
+        similarity: Number(row.similarity ?? 0),
+      }))
+      .filter((row) => row.content.length > 0);
   }
 }

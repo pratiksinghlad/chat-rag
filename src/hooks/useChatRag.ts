@@ -9,8 +9,14 @@ import {
   toConversationHistory,
   toUiMessages,
 } from '@/services/chat-history/utils';
+import type { ChatMode } from '@/services/ai/chat-mode';
 import type { ChatSessionDetail } from '@/services/chat-history/types';
 import type { ChatMessage } from '@/types/chat';
+
+interface SendMessageInput {
+  message: string;
+  mode: ChatMode;
+}
 
 interface UseChatRagReturn {
   activeChatId: string | null;
@@ -20,7 +26,7 @@ interface UseChatRagReturn {
   isDeletingChat: boolean;
   error: string | null;
   activeChatTitle: string | null;
-  sendMessage: (input: string) => Promise<void>;
+  sendMessage: (input: SendMessageInput) => Promise<void>;
   clearChat: () => void;
   deleteActiveChat: () => Promise<void>;
 }
@@ -96,8 +102,8 @@ export function useChatRag(): UseChatRagReturn {
   }, [chatId, getChatById, navigate, user?.email]);
 
   const sendMessage = useCallback(
-    async (input: string) => {
-      const trimmed = input.trim();
+    async (input: SendMessageInput) => {
+      const trimmed = input.message.trim();
       if (!trimmed) return;
 
       if (!user?.email) {
@@ -132,6 +138,7 @@ export function useChatRag(): UseChatRagReturn {
         const response = await chatService.getChatResponse({
           message: trimmed,
           history,
+          mode: input.mode,
         });
 
         const assistantMessage = createStoredChatMessage(

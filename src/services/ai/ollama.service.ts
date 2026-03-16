@@ -73,6 +73,7 @@ export class OllamaChatService
       return {
         text,
         provider: 'ollama',
+        isGrounded: false,
       };
     } catch (error) {
       if (

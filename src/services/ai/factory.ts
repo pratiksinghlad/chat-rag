@@ -57,7 +57,8 @@ function getBundle(): ServiceBundle {
       ragChatService: new RagChatService(
         providerChatService,
         embeddingService,
-        repository
+        repository,
+        providerName
       ),
     };
 
@@ -84,7 +85,8 @@ function getBundle(): ServiceBundle {
       ragChatService: new RagChatService(
         providerChatService,
         embeddingService,
-        repository
+        repository,
+        providerName
       ),
     };
 
