@@ -1,8 +1,8 @@
 import type { RetrievedDocument } from '@/services/ai/types';
 
 interface KnowledgeBaseAnalysis {
-  isFaq: boolean;
   isStrongMatch: boolean;
+  lexicalCoverage: number;
   rerankScore: number;
 }
 
@@ -17,21 +17,67 @@ interface RankedDocument {
   document: RetrievedDocument;
 }
 
-const FAQ_SIMILARITY_THRESHOLD = 0.6;
-const GENERAL_KB_SIMILARITY_THRESHOLD = 0.75;
+const TOKEN_PATTERN = /[a-z0-9]+/g;
+const STOP_WORDS = new Set([
+  'a',
+  'an',
+  'and',
+  'are',
+  'can',
+  'company',
+  'do',
+  'for',
+  'how',
+  'i',
+  'in',
+  'is',
+  'it',
+  'me',
+  'my',
+  'of',
+  'on',
+  'or',
+  'our',
+  'please',
+  'tell',
+  'the',
+  'to',
+  'us',
+  'we',
+  'what',
+  'with',
+  'you',
+  'your',
+]);
+const SEARCHABLE_METADATA_FIELDS = [
+  'question',
+  'answer',
+  'category',
+  'tags',
+  'title',
+  'heading',
+  'section',
+  'summary',
+  'keywords',
+] as const;
+const DOCUMENT_MATCH_POLICY = {
+  minimumSimilarity: 0.6,
+  minimumLexicalCoverage: 0.5,
+  lexicalWeight: 0.05,
+} as const;
 
 export function rerankKnowledgeBaseDocuments(
-  _query: string,
+  query: string,
   documents: RetrievedDocument[]
 ): RetrievedDocument[] {
-  return rankDocuments(documents).map(({ document }) => document);
+  return rankDocuments(query, documents).map(({ document }) => document);
 }
 
 export function resolveKnowledgeBaseAnswer(
-  _query: string,
+  query: string,
   documents: RetrievedDocument[]
 ): KnowledgeBaseResolution {
-  const rankedDocuments = rankDocuments(documents);
+  const rankedDocuments = rankDocuments(query, documents);
   const strongMatch = rankedDocuments.find(({ analysis }) => analysis.isStrongMatch);
 
   return {
@@ -41,10 +87,12 @@ export function resolveKnowledgeBaseAnswer(
   };
 }
 
-function rankDocuments(documents: RetrievedDocument[]): RankedDocument[] {
+function rankDocuments(query: string, documents: RetrievedDocument[]): RankedDocument[] {
+  const queryTerms = tokenize(query);
+
   return documents
     .map((document) => ({
-      analysis: analyzeDocumentMatch(document),
+      analysis: analyzeDocumentMatch(queryTerms, document),
       document,
     }))
     .sort((left, right) => {
@@ -56,16 +104,24 @@ function rankDocuments(documents: RetrievedDocument[]): RankedDocument[] {
     });
 }
 
-function analyzeDocumentMatch(document: RetrievedDocument): KnowledgeBaseAnalysis {
-  const isFaq = document.metadata.document_type === 'faq';
-  const similarityThreshold = isFaq
-    ? FAQ_SIMILARITY_THRESHOLD
-    : GENERAL_KB_SIMILARITY_THRESHOLD;
+function analyzeDocumentMatch(
+  queryTerms: ReadonlySet<string>,
+  document: RetrievedDocument
+): KnowledgeBaseAnalysis {
+  const lexicalCoverage = getQueryCoverage(
+    queryTerms,
+    buildSearchTerms(document)
+  );
+  const isStrongMatch =
+    document.similarity >= DOCUMENT_MATCH_POLICY.minimumSimilarity &&
+    lexicalCoverage >= DOCUMENT_MATCH_POLICY.minimumLexicalCoverage;
 
   return {
-    isFaq,
-    isStrongMatch: document.similarity >= similarityThreshold,
-    rerankScore: document.similarity,
+    isStrongMatch,
+    lexicalCoverage,
+    rerankScore:
+      document.similarity +
+      lexicalCoverage * DOCUMENT_MATCH_POLICY.lexicalWeight,
   };
 }
 
@@ -82,4 +138,87 @@ function getDeterministicResponseText(document: RetrievedDocument): string {
 
 function getStringMetadata(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
+}
+
+function buildSearchTerms(document: RetrievedDocument): ReadonlySet<string> {
+  return tokenize([
+    document.content,
+    ...getSearchableMetadataValues(document.metadata),
+  ].join(' '));
+}
+
+function getSearchableMetadataValues(
+  metadata: RetrievedDocument['metadata']
+): string[] {
+  return SEARCHABLE_METADATA_FIELDS.flatMap((field) =>
+    getMetadataFieldValues(metadata[field])
+  );
+}
+
+function getMetadataFieldValues(value: unknown): string[] {
+  if (typeof value === 'string') {
+    return value.trim() ? [value.trim()] : [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap((entry) => getMetadataFieldValues(entry));
+  }
+
+  return [];
+}
+
+function getQueryCoverage(
+  queryTerms: ReadonlySet<string>,
+  candidateTerms: ReadonlySet<string>
+): number {
+  if (queryTerms.size === 0 || candidateTerms.size === 0) {
+    return 0;
+  }
+
+  let matchedTerms = 0;
+  for (const term of queryTerms) {
+    if (candidateTerms.has(term)) {
+      matchedTerms += 1;
+    }
+  }
+
+  return matchedTerms / queryTerms.size;
+}
+
+function tokenize(value: string): Set<string> {
+  const matches = value.toLowerCase().match(TOKEN_PATTERN) ?? [];
+
+  return new Set(
+    matches
+      .map(normalizeToken)
+      .filter((term) => term.length > 1 && !STOP_WORDS.has(term))
+  );
+}
+
+function normalizeToken(token: string): string {
+  if (token.length <= 3) {
+    return token;
+  }
+
+  if (token.endsWith('ies') && token.length > 4) {
+    return `${token.slice(0, -3)}y`;
+  }
+
+  if (token.endsWith('ing') && token.length > 5) {
+    return token.slice(0, -3);
+  }
+
+  if (token.endsWith('ed') && token.length > 4) {
+    return token.slice(0, -2);
+  }
+
+  if (token.endsWith('es') && token.length > 4) {
+    return token.slice(0, -2);
+  }
+
+  if (token.endsWith('s') && token.length > 3) {
+    return token.slice(0, -1);
+  }
+
+  return token;
 }

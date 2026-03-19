@@ -135,14 +135,16 @@ function mapChatSessionRow(row: {
   lastActivityDate: string;
   messages: unknown;
 }): ChatSessionDetail {
+  const messages = parseMessages(row.messages);
+
   return {
     id: row.id,
     title: row.title,
     createdBy: row.createdBy,
     creationDate: row.creationDate,
     lastActivityDate: row.lastActivityDate,
-    messages: parseMessages(row.messages),
-    messageCount: parseMessages(row.messages).length,
+    messages,
+    messageCount: messages.length,
   };
 }
 
@@ -174,6 +176,10 @@ function parseMessages(value: unknown): StoredChatMessage[] {
         role: candidate.role,
         content: candidate.content,
         timestamp: candidate.timestamp,
+        isGrounded:
+          typeof candidate.isGrounded === 'boolean'
+            ? candidate.isGrounded
+            : undefined,
       },
     ];
   });
