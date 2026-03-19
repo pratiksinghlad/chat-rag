@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import {
   AlertDialog,
   AlertDialogBody,
@@ -156,6 +156,46 @@ export function ChatRagPage() {
           </Flex>
 
           <Flex align="center" gap={2}>
+            <Button
+              as={Link}
+              to="/documents"
+              size="sm"
+              variant="ghost"
+              color="gray.600"
+              fontWeight="medium"
+              leftIcon={
+                <Icon viewBox="0 0 24 24" boxSize={4}>
+                  <path
+                    fill="currentColor"
+                    d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.1-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-3.45.3-5 1V7c1.55-.7 3.3-1 5-1 1.2 0 2.4.15 3.5.5v11zm-10 1c-1.55-.7-3.3-1-5-1-1.45 0-3.4.45-4.75 1.1V7c1.2-.5 2.5-.75 3.75-.75 1.7 0 3.45.3 5 1v11.75z"
+                  />
+                </Icon>
+              }
+              display={{ base: "none", md: "flex" }}
+              _hover={{ bg: "blue.50", color: "blue.600" }}
+              borderRadius="xl"
+            >
+              Knowledge Base
+            </Button>
+            
+            <IconButton
+              as={Link}
+              to="/documents"
+              aria-label="Knowledge Base"
+              variant="ghost"
+              size="md"
+              display={{ base: "flex", md: "none" }}
+              borderRadius="xl"
+              icon={
+                <Icon viewBox="0 0 24 24" boxSize={5}>
+                  <path
+                    fill="currentColor"
+                    d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.1-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-3.45.3-5 1V7c1.55-.7 3.3-1 5-1 1.2 0 2.4.15 3.5.5v11zm-10 1c-1.55-.7-3.3-1-5-1-1.45 0-3.4.45-4.75 1.1V7c1.2-.5 2.5-.75 3.75-.75 1.7 0 3.45.3 5 1v11.75z"
+                  />
+                </Icon>
+              }
+            />
+
             {activeChatId ? (
               <IconButton
                 aria-label="Delete chat"

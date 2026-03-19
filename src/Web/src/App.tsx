@@ -11,6 +11,7 @@ import { ChatHistoryProvider } from "@/context/ChatHistoryContext";
 import LandingPage from "@/pages/LandingPage";
 import ProfilePage from "@/pages/ProfilePage";
 import ChatRagPage from "@/pages/ChatRagPage";
+import KnowledgeBaseDocuments from "@/pages/KnowledgeBaseDocuments";
 import "@/styles/index.css";
 
 function App() {
@@ -29,6 +30,9 @@ function App() {
               {/* Chat RAG page (authenticated) */}
               <Route path="/chat" element={<ChatRagPage />} />
               <Route path="/chat/:chatId" element={<ChatRagPage />} />
+
+              {/* Knowledge Base Documents page (authenticated) */}
+              <Route path="/documents" element={<KnowledgeBaseDocuments />} />
 
               {/* Catch-all redirect */}
               <Route path="*" element={<Navigate to="/" replace />} />

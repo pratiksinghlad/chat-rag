@@ -68,21 +68,17 @@ export function LandingPage() {
         <VStack spacing={12}>
           {/* Header */}
           <VStack spacing={6} textAlign="center">
-            <Icon viewBox="0 0 100 100" boxSize={16} color="blue.600">
+            <Icon viewBox="0 0 24 24" boxSize={16} color="blue.600">
               <circle
-                cx="50"
-                cy="50"
-                r="45"
+                cx="12"
+                cy="12"
+                r="11"
                 fill="currentColor"
-                opacity="0.2"
+                opacity="0.15"
               />
               <path
-                d="M30 50 L45 65 L70 35"
-                stroke="currentColor"
-                strokeWidth="6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="none"
+                d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"
+                fill="currentColor"
               />
             </Icon>
             <VStack spacing={2}>
@@ -173,7 +169,7 @@ export function LandingPage() {
               icon={
                 <path
                   fill="currentColor"
-                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                  d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2z"
                 />
               }
               title="Simple"
