@@ -213,14 +213,14 @@ export function ChatInput({ onSend, isDisabled }: ChatInputProps) {
           bg={disclaimerBg}
           borderWidth="1px"
           borderColor="orange.100"
-          align="center"
+          align="flex-start"
           gap={2}
-          display={{ base: "none", sm: "flex" }}
+          display="flex"
         >
-          <Text color="red.600" fontSize="xs" fontWeight="medium">
+          <Text color="red.600" fontSize="xs" fontWeight="medium" lineHeight="tall">
             {"\u26A0\uFE0F"} Please avoid entering sensitive or confidential
-        information. This system uses a cloud-based LLM provider to process
-        requests.
+            information. This system uses a cloud-based LLM provider to process
+            requests.
           </Text>
         </Flex>
       </Box>
