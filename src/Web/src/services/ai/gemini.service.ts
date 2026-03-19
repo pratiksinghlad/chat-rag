@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, TaskType } from '@google/generative-ai';
 import {
   AIConfigurationError,
   AIProviderError,
@@ -103,7 +103,13 @@ export class GeminiEmbeddingService
 
       return Promise.all(
         values.map(async (value) => {
-          const result = await model.embedContent(value);
+          const result = await model.embedContent({
+            content: {
+              role: 'user',
+              parts: [{ text: value }],
+            },
+            taskType: TaskType.RETRIEVAL_QUERY,
+          });
           return result.embedding.values;
         })
       );

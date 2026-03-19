@@ -34,22 +34,22 @@ User Input
     │
     ▼
 ┌───────────────────┐
-│  1. Embed Query   │  → Gemini gemini-embedding-001 → 768-dim vector
+│  1. Embed Query   │  → Gemini gemini-embedding-001 (RETRIEVAL_QUERY) → 3072-dim vector
 └───────┬───────────┘
         │
         ▼
 ┌───────────────────┐
-│  2. Vector Search │  → Supabase match_documents RPC (cosine similarity)
+│  2. Vector Search │  → Supabase match_documents RPC on `halfvec(3072)`
 └───────┬───────────┘
         │
         ▼
 ┌───────────────────┐
-│  3. Augment Prompt│  → Inject top-K documents into system prompt
+│  3. KB Resolve    │  → Deterministic FAQ / KB answer on strong knowledge hits
 └───────┬───────────┘
         │
         ▼
 ┌───────────────────┐
-│  4. Generate      │  → Gemini gemini-3-flash-preview → final response
+│  4. Generate      │  → Gemini gemini-3-flash-preview only when KB does not fully answer
 └───────┬───────────┘
         │
         ▼
@@ -97,8 +97,10 @@ npm install
 
 # 3. Run the Supabase SQL scripts (see README-SUPABASE.md)
 
-# 4. Start the dev server
+# 4. Reindex the embedding corpus after enabling the FAQ-aware loader
+
+# 5. Start the dev server
 npm run start
 
-# 5. Navigate to /chat after signing in
+# 6. Navigate to /chat after signing in
 ```

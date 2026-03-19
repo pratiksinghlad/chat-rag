@@ -8,6 +8,7 @@ This document explains why you might see similarity scores around **0.65 – 0.7
 
 Traditional search (like SQL `LIKE` or Ctrl+F) looks for **exact characters**.
 Vector embeddings represent the **meaning (semantics)** of the text in a 3,072-dimensional space.
+In this app, stored KB chunks use Gemini `RETRIEVAL_DOCUMENT` embeddings and browser-side queries use Gemini `RETRIEVAL_QUERY` embeddings.
 
 - **Query: "React"**
   - This vector represents the broad, abstract concept of "React".
@@ -35,7 +36,7 @@ Scores in the **0.65 – 0.75** range are common for high-fidelity models like `
 
 ## 4. Recommended Thresholds
 
-If you want to filter out bad results but keep the "React" and "Gemini" matches, we recommend setting your `MATCH_THRESHOLD` in `src/types/chat.ts` to:
+If you want to filter out bad results but keep the "React" and "Gemini" matches, tune the Supabase `match_threshold` conservatively and let the client reranker promote exact FAQ hits:
 
 - **0.50**: Safe starting point for production.
 - **0.60**: Strict, high-precision results only.

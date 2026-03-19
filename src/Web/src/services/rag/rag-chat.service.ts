@@ -7,6 +7,10 @@ import type {
   RetrievedDocument,
 } from '@/services/ai/types';
 import { DEFAULT_CHAT_MODE } from '@/services/ai/chat-mode';
+import {
+  rerankKnowledgeBaseDocuments,
+  resolveKnowledgeBaseAnswer,
+} from '@/services/rag/knowledge-base';
 import type { IVectorSearchRepository } from '@/services/rag/vector-search.repository';
 
 const KNOWLEDGE_BASE_ONLY_FALLBACK =
@@ -31,29 +35,46 @@ export class RagChatService implements IChatService {
     }
 
     const [embedding] = await this.embeddingService.createEmbedding(input.message);
-    const contextDocuments = await this.vectorSearchRepository.searchSimilar(
+    const retrievedDocuments = await this.vectorSearchRepository.searchSimilar(
       embedding
     );
+    const contextDocuments = rerankKnowledgeBaseDocuments(
+      input.message,
+      retrievedDocuments
+    );
+    const knowledgeBaseResolution = resolveKnowledgeBaseAnswer(
+      input.message,
+      contextDocuments
+    );
 
-    const isGrounded = hasUsableKnowledgeBaseContext(contextDocuments);
-
-    if (mode === 'knowledge-base' && !isGrounded) {
+    if (mode === 'knowledge-base' && !knowledgeBaseResolution.hasStrongMatch) {
       return {
         text: KNOWLEDGE_BASE_ONLY_FALLBACK,
         provider: this.provider,
-        contextDocuments,
+        contextDocuments: knowledgeBaseResolution.documents,
         isGrounded: false,
       };
     }
 
+    if (knowledgeBaseResolution.hasStrongMatch && knowledgeBaseResolution.responseText) {
+      return {
+        text: knowledgeBaseResolution.responseText,
+        provider: this.provider,
+        contextDocuments: knowledgeBaseResolution.documents,
+        isGrounded: true,
+      };
+    }
+
+    const isGrounded = hasUsableKnowledgeBaseContext(knowledgeBaseResolution.documents);
+
     const response = await this.providerChatService.getChatResponse({
       ...input,
-      systemInstruction: buildSystemInstruction(contextDocuments, mode),
+      systemInstruction: buildSystemInstruction(knowledgeBaseResolution.documents, mode),
     });
 
     return {
       ...response,
-      contextDocuments,
+      contextDocuments: knowledgeBaseResolution.documents,
       isGrounded,
     };
   }

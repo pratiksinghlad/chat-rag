@@ -47,20 +47,20 @@ export interface Database {
         Row: {
           id: string;
           content: string;
-          metadata: Record<string, string>;
+          metadata: Json;
           embedding: number[];
           created_at: string;
         };
         Insert: {
           id?: string;
           content: string;
-          metadata?: Record<string, string>;
+          metadata?: Json;
           embedding: number[];
           created_at?: string;
         };
         Update: {
           content?: string;
-          metadata?: Record<string, string>;
+          metadata?: Json;
           embedding?: number[];
         };
         Relationships: [];
@@ -77,7 +77,7 @@ export interface Database {
         Returns: {
           id: string;
           content: string;
-          metadata: Record<string, string>;
+          metadata: Json;
           similarity: number;
         }[];
       };

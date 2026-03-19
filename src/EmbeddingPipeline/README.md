@@ -9,6 +9,7 @@ Incremental document ingestion for a RAG system using Gemini embeddings, LangCha
 - Generates Gemini embeddings through the Google REST API
 - Upserts chunks into the Supabase `documents` table
 - Uses LangChain incremental indexing so unchanged chunks are skipped and removed source files are cleaned up
+- Indexes structured FAQ JSON as one clean question/answer record per entry
 
 The pipeline keeps the existing Supabase schema unchanged. `documents.id` remains a `uuid`.
 
@@ -60,7 +61,7 @@ create table if not exists documents (
   id uuid primary key default gen_random_uuid(),
   content text not null,
   metadata jsonb default '{}'::jsonb,
-  embedding vector(3072),
+  embedding halfvec(3072),
   created_at timestamptz default now()
 );
 ```
@@ -69,7 +70,7 @@ It also expects the `match_documents` function used by the frontend:
 
 ```sql
 create or replace function match_documents(
-  query_embedding vector(3072),
+  query_embedding halfvec(3072),
   match_threshold float,
   match_count int
 )
@@ -148,7 +149,7 @@ Those values are not supported by the installed LangChain `SupabaseVectorStore`,
 - `.txt`
 - `.md`
 - `.csv`
-- `.json`
+- `.json` (`entries[]` FAQ payloads are indexed entry-by-entry; other JSON falls back to plain text)
 - `.log`
 - `.rst`
 

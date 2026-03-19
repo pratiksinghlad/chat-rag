@@ -12,12 +12,14 @@ import logging
 from pathlib import Path
 
 from src.loaders.base import BaseDocumentLoader
+from src.loaders.json_loader import JsonDocumentLoader
 from src.loaders.pdf_loader import PDFDocumentLoader
 from src.loaders.text_loader import TextDocumentLoader
 
 logger = logging.getLogger(__name__)
 
 # Singleton loader instances (stateless, safe to reuse)
+_JSON_LOADER = JsonDocumentLoader()
 _PDF_LOADER = PDFDocumentLoader()
 _TEXT_LOADER = TextDocumentLoader()
 
@@ -27,7 +29,7 @@ _LOADER_REGISTRY: dict[str, BaseDocumentLoader] = {
     ".txt": _TEXT_LOADER,
     ".md": _TEXT_LOADER,
     ".csv": _TEXT_LOADER,
-    ".json": _TEXT_LOADER,
+    ".json": _JSON_LOADER,
     ".log": _TEXT_LOADER,
     ".rst": _TEXT_LOADER,
 }

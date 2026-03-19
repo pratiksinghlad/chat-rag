@@ -17,21 +17,20 @@ create table if not exists documents (
   id uuid primary key default gen_random_uuid(),
   content text not null,
   metadata jsonb default '{}'::jsonb,
-  embedding vector(3072),
+  embedding halfvec(3072),
   created_at timestamptz default now()
 );
 
--- HNSW index for fast similarity search
-create index on documents using hnsw (embedding vector_cosine_ops);
+create index on documents using hnsw (embedding halfvec_cosine_ops);
 ```
 
-> **Why 3072 dimensions?** The `gemini-embedding-001` model outputs 3072-dimensional vectors by default. It supports Matryoshka Representation Learning allowing reduction to 1536 or 768, but 3072 provides the highest quality.
+> `gemini-embedding-001` returns 3072 dimensions by default, and the current app expects `halfvec(3072)` end to end.
 
 ## 3. Create the `match_documents` RPC Function
 
 ```sql
 create or replace function match_documents (
-  query_embedding vector(3072),
+  query_embedding halfvec(3072),
   match_threshold float,
   match_count int
 )
@@ -55,6 +54,8 @@ as $$
 $$;
 ```
 
+Use Gemini `RETRIEVAL_DOCUMENT` for ingested documents and Gemini `RETRIEVAL_QUERY` for browser-side search queries.
+
 ## 4. Insert Sample Documents
 
 ```sql
@@ -63,36 +64,47 @@ values
 (
   'React is a JavaScript library for building user interfaces. It was created by Facebook (now Meta). Key concepts include JSX, Virtual DOM, hooks like useState and useEffect, and one-way data binding.',
   '{"topic": "react", "source": "knowledge-base"}'::jsonb,
-  (select array_agg(0.1 + (i % 10) * 0.001) from generate_series(1, 3072) as s(i))::vector
+  (select array_agg(0.1 + (i % 10) * 0.001) from generate_series(1, 3072) as s(i))::halfvec
 ),
 (
   'Supabase is an open source Firebase alternative. It provides a PostgreSQL database, authentication, instant APIs, edge functions, realtime subscriptions, storage, and vector embeddings via pgvector.',
   '{"topic": "supabase", "source": "knowledge-base"}'::jsonb,
-  (select array_agg(0.5 + (i % 10) * 0.001) from generate_series(1, 3072) as s(i))::vector
+  (select array_agg(0.5 + (i % 10) * 0.001) from generate_series(1, 3072) as s(i))::halfvec
 ),
 (
   'Gemini is a family of multimodal AI models developed by Google DeepMind. The embedding model gemini-embedding-001 produces 3072-dimensional vectors by default.',
   '{"topic": "gemini", "source": "knowledge-base"}'::jsonb,
-  (select array_agg(0.9 + (i % 10) * 0.001) from generate_series(1, 3072) as s(i))::vector
+  (select array_agg(0.9 + (i % 10) * 0.001) from generate_series(1, 3072) as s(i))::halfvec
 );
 ```
 
 ## 5. Quick Test
 
-You can test the function directly in the SQL Editor:
-
 ```sql
--- Use match_threshold = 0.0 when testing with dummy seed data.
--- Dummy vectors (~0.1 uniform) have near-zero cosine similarity with
--- real Gemini embeddings, so a threshold of 0.5 will return nothing.
 select * from match_documents(
-  (select array_agg(0.1 + (i % 10) * 0.001) from generate_series(1, 768) as s(i))::vector,
-  0.0,  -- threshold: 0.0 returns everything
+  (select array_agg(0.1 + (i % 10) * 0.001) from generate_series(1, 3072) as s(i))::halfvec,
+  0.0,
   5
 );
 ```
 
-This should return all 3 documents. If you get `[]`, make sure you ran `setup_rag.sql` successfully first.
+This should return all 3 documents. If you get `[]`, make sure you ran the schema successfully first.
 
-> **Why empty results with real Gemini embeddings?**
-> The seed data uses dummy vectors (`0.1, 0.1, ...`). Their cosine similarity against a real Gemini embedding is near zero — well below the default 0.5 threshold. The app code now uses `MATCH_THRESHOLD: 0.0` so all documents are returned during testing. Once you populate the DB with **real** Gemini-generated embeddings, raise the threshold back to `0.3`–`0.5`.
+## 6. One-Time Reset After the FAQ Loader Fix
+
+If `faq.json` was previously indexed as raw text, do this once:
+
+1. `delete from public.documents;`
+2. Remove `EmbeddingPipeline/data/record_manager.db`
+3. Re-run the embedding pipeline
+
+After reindexing, FAQ rows should appear as individual records:
+
+```sql
+select
+  metadata->>'document_type' as document_type,
+  metadata->>'faq_id' as faq_id,
+  metadata->>'question' as question
+from public.documents
+where metadata->>'document_type' = 'faq';
+```
