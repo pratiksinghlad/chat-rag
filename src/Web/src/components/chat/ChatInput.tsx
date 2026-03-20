@@ -38,6 +38,9 @@ export function ChatInput({ onSend, isDisabled }: ChatInputProps) {
   const placeholderColor = useColorModeValue("gray.400", "gray.500");
   const helperTextColor = useColorModeValue("gray.500", "gray.400");
   const disclaimerBg = useColorModeValue("orange.50", "rgba(251, 211, 141, 0.08)");
+  const menuButtonHoverBg = useColorModeValue("gray.200", "gray.700");
+  const selectedItemBg = useColorModeValue("blue.50", "blue.900");
+  const itemHoverBg = useColorModeValue("gray.100", "gray.700");
 
   const selectedMode = CHAT_MODE_OPTIONS.find((option) => option.value === mode);
 
@@ -110,7 +113,7 @@ export function ChatInput({ onSend, isDisabled }: ChatInputProps) {
                   fontWeight="medium"
                   fontSize="xs"
                   color={helperTextColor}
-                  _hover={{ bg: useColorModeValue("gray.200", "gray.700") }}
+                  _hover={{ bg: menuButtonHoverBg }}
                   isDisabled={isDisabled}
                   display={{ base: "none", sm: "flex" }}
                 >
@@ -130,9 +133,9 @@ export function ChatInput({ onSend, isDisabled }: ChatInputProps) {
                     onClick={() => setMode(option.value as ChatMode)}
                     fontSize="sm"
                     fontWeight={mode === option.value ? "bold" : "normal"}
-                    bg={mode === option.value ? useColorModeValue("blue.50", "blue.900") : "transparent"}
+                    bg={mode === option.value ? selectedItemBg : "transparent"}
                     color={mode === option.value ? "blue.500" : "inherit"}
-                    _hover={{ bg: useColorModeValue("gray.100", "gray.700") }}
+                    _hover={{ bg: itemHoverBg }}
                     px={4}
                     py={2}
                   >

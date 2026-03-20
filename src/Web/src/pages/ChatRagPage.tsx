@@ -63,6 +63,8 @@ export function ChatRagPage() {
     "rgba(255, 255, 255, 0.8)",
     "rgba(10, 10, 10, 0.8)"
   );
+  const iconBoxBg = useColorModeValue("blue.50", "rgba(66, 153, 225, 0.1)");
+  const scrollbarThumbBg = useColorModeValue("#E2E8F0", "#2D3748");
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -126,7 +128,7 @@ export function ChatRagPage() {
           <Flex align="center" gap={3}>
             <Box 
               p={2.5} 
-              bg={useColorModeValue("blue.50", "rgba(66, 153, 225, 0.1)")} 
+              bg={iconBoxBg} 
               borderRadius="xl" 
               color="blue.500"
               display={{ base: "none", sm: "block" }}
@@ -256,7 +258,7 @@ export function ChatRagPage() {
               "&::-webkit-scrollbar": { width: "6px" },
               "&::-webkit-scrollbar-track": { background: "transparent" },
               "&::-webkit-scrollbar-thumb": { 
-                background: useColorModeValue("#E2E8F0", "#2D3748"),
+                background: scrollbarThumbBg,
                 borderRadius: "10px" 
               },
             }}
@@ -274,7 +276,7 @@ export function ChatRagPage() {
                 <VStack spacing={6} maxW="2xl" mx="auto" textAlign="center" p={8}>
                   <Box
                     p={6}
-                    bg={useColorModeValue("blue.50", "rgba(66, 153, 225, 0.1)")}
+                    bg={iconBoxBg}
                     borderRadius="3xl"
                     color="blue.500"
                     boxShadow="inner"
@@ -335,6 +337,7 @@ export function ChatRagPage() {
                         border="2px solid"
                         borderColor="blue.200"
                         animate={{ scale: [1, 1.5], opacity: [0.5, 0] }}
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         transition={{ duration: 1, repeat: Infinity } as any}
                       />
                     </Box>
