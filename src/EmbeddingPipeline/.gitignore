@@ -1,0 +1,29 @@
+# Virtual environment
+.venv/
+
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Logs
+logs/*.log
+
+# Data (keep directory, ignore contents)
+data/documents/*
+!data/documents/.gitkeep
+
+# Record manager DB
+data/*.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
