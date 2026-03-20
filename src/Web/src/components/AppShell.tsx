@@ -9,7 +9,7 @@ interface AppShellProps {
 
 export function AppShell({ children }: AppShellProps) {
   const location = useLocation();
-  const bg = useColorModeValue("gray.50", "gray.900");
+  const bg = useColorModeValue("white", "gray.900");
   const isChatRoute = location.pathname.startsWith("/chat");
 
   return (
