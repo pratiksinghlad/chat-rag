@@ -2,6 +2,8 @@
 
 Incremental document ingestion for a RAG system using Gemini embeddings, LangChain, and Supabase pgvector.
 
+Current repo setup: this pipeline uses Gemini embeddings and writes chunks into the Supabase `documents` table consumed by the web app.
+
 ## What it does
 
 - Loads supported files from `data/documents`
@@ -42,7 +44,7 @@ EmbeddingPipeline/
 ## Setup
 
 ```bash
-cd EmbeddingPipeline
+cd src/EmbeddingPipeline
 uv sync
 ```
 

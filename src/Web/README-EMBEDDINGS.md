@@ -1,49 +1,59 @@
-Semantic search is an advanced information retrieval technique that understands the meaning, context, and intent behind a user's query, rather than just matching keywords.
+# Embeddings And RAG, In Plain English
 
-# Embedding Similarity & Semantic Search
+This project uses embeddings to find useful knowledge-base chunks before the model answers. That is the heart of retrieval-augmented generation, or RAG.
 
-This document explains why you might see similarity scores around **0.65 – 0.70** even when a keyword like "React" exists in the document, and why this is actually expected behavior for vector embeddings.
+## Tiny Glossary
 
-## 1. Keywords vs. Semantics
+- **Embedding**: A list of numbers that captures the meaning of text, not just the exact words.
+- **RAG**: A pattern where the app retrieves relevant documents first, then gives them to the LLM while answering.
+- **Query embedding**: The vector made from the user's question so the database can search by meaning.
+- **Document embedding**: The vector stored for each chunk of your knowledge base so similar questions can find it later.
+- **Similarity score**: A number showing how closely two embeddings point in the same semantic direction.
+- **Chunking**: Splitting big documents into smaller pieces so retrieval stays focused and useful.
 
-Traditional search (like SQL `LIKE` or Ctrl+F) looks for **exact characters**.
-Vector embeddings represent the **meaning (semantics)** of the text in a 3,072-dimensional space.
-In this app, stored KB chunks use Gemini `RETRIEVAL_DOCUMENT` embeddings and browser-side queries use Gemini `RETRIEVAL_QUERY` embeddings.
+## Current Pipeline In This Repo
 
-- **Query: "React"**
-  - This vector represents the broad, abstract concept of "React".
-- **Document: "React is a JavaScript library for building user interfaces..."**
-  - This vector represents a specific definition and technical details.
+```text
+Documents
+  -> split into chunks
+  -> create embeddings
+  -> store in Supabase `documents`
+  -> embed the user query
+  -> search with `match_documents`
+  -> rerank results
+  -> answer from KB or LLM
+```
 
-Because the document is much more specific and contains many other concepts (JavaScript, Meta, hooks, etc.), its "semantic center" is slightly different from the generic word "React". In a 3,072-dimensional space, an angle of 0.68 is actually a **very strong match**.
+## What Happens Here Specifically
 
-## 2. Cosine Similarity Scaling
+1. The Python pipeline reads supported files and splits them into chunks.
+2. The pipeline currently uses Gemini `gemini-embedding-001` for document embeddings.
+3. Each chunk is stored in Supabase `documents` with a `halfvec(3072)` embedding.
+4. At chat time, the web app embeds the user question with the active provider.
+5. Supabase returns similar chunks through the `match_documents` RPC.
+6. Strong FAQ-like matches can answer directly; otherwise the LLM writes the final response.
 
-Cosine similarity ranges from `-1.0` (opposites) to `1.0` (identical).
+## Why A Single Keyword Might Score Around `0.60`
 
-| Score           | Quality        | Meaning                                                             |
-| :-------------- | :------------- | :------------------------------------------------------------------ |
-| **0.90 – 1.00** | Near Identical | Almost exact same text or extremely high overlap.                   |
-| **0.75 – 0.89** | Very Strong    | Highly relevant, usually similar sentence structure.                |
-| **0.60 – 0.74** | Strong Match   | **Semantic match** (e.g., your "React" tests). Very useful for RAG. |
-| **0.40 – 0.59** | Broad Match    | Related topic but different focus.                                  |
-| **Below 0.30**  | Irrelevant     | Mostly noise or very weak connection.                               |
+Embeddings compare meaning, not exact string matches, so a short query like `React` is compared with the meaning of a full paragraph. A score around `0.60` to `0.70` is often a strong semantic match, not a bad result.
 
-## 3. High-Dimensionality Behavior (3072 dims)
+## Simple Score Guide
 
-As you increase dimensions (from 768 to 3072), the mathematical space becomes "sparser." Vectors are rarely "perfectly" aligned unless the text is nearly identical.
-Scores in the **0.65 – 0.75** range are common for high-fidelity models like `gemini-embedding-001` when performing natural language queries.
+| Score | Usually means |
+| --- | --- |
+| `0.75+` | Very close match or near-duplicate wording |
+| `0.60 - 0.74` | Strong semantic match and often good enough for RAG |
+| `Below 0.50` | Broader or weaker relation |
 
-## 4. Recommended Thresholds
+The web app currently searches with:
 
-If you want to filter out bad results but keep the "React" and "Gemini" matches, tune the Supabase `match_threshold` conservatively and let the client reranker promote exact FAQ hits:
+- `matchThreshold = 0.60`
+- `matchCount = 5`
 
-- **0.50**: Safe starting point for production.
-- **0.60**: Strict, high-precision results only.
+That keeps retrieval fairly strict while still letting relevant KB chunks through.
 
-## 5. Summary: Why only 0.68?
+## Related Docs
 
-When you search for "React", the model is asking: _"How similar is the abstract idea of 'React' to this specific descriptive paragraph?"_
-The answer is **"Very similar (~0.68)"**, but not **"Identical (1.0)"**.
-
-If you searched for the exact sentence: _"React is a JavaScript library..."_, you would see a score closer to **0.95+**.
+- [Web integration setup](./README-INTEGRATION.md)
+- [Supabase and pgvector setup](./README-SUPABASE.md)
+- [Embedding pipeline guide](../EmbeddingPipeline/README.md)

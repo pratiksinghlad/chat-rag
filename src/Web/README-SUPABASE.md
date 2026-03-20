@@ -1,19 +1,88 @@
-# Supabase Setup for Chat-RAG (pgvector)
+# Supabase + pgvector Setup
 
-This guide walks through setting up the Supabase vector store for the RAG pipeline.
+Supabase does three jobs in this project: user auth, chat history storage, and vector search.
 
-## 1. Enable pgvector Extension
+**Vector DB pg**: Postgres stores embeddings through the `pgvector` extension. Supabase lets the app query those vectors with SQL and RPC functions.
 
-Open the **SQL Editor** in your Supabase Dashboard and run:
+## Environment Variables
+
+### For the web app
+
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+### For the embedding pipeline
+
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
+
+The web app uses the public anon key. The pipeline needs the service role key because it writes embeddings into `documents`.
+
+## 1. Chat History Schema
+
+Run this in the Supabase SQL editor to create `chat_sessions` and the search index used by the sidebar:
+
+```sql
+create extension if not exists pg_trgm;
+
+create table if not exists public.chat_sessions (
+  id uuid primary key default gen_random_uuid(),
+  "createdBy" text not null,
+  title text not null,
+  "creationDate" timestamptz not null default now(),
+  "lastActivityDate" timestamptz not null default now(),
+  messages jsonb not null default '[]'::jsonb,
+  constraint chat_sessions_messages_is_array
+    check (jsonb_typeof(messages) = 'array')
+);
+
+create index if not exists chat_sessions_createdBy_lastActivityDate_idx
+  on public.chat_sessions ("createdBy", "lastActivityDate" desc);
+
+create index if not exists chat_sessions_title_trgm_idx
+  on public.chat_sessions
+  using gin (title gin_trgm_ops);
+
+alter table public.chat_sessions enable row level security;
+
+drop policy if exists "chat_sessions_select_own" on public.chat_sessions;
+create policy "chat_sessions_select_own"
+  on public.chat_sessions
+  for select
+  using ("createdBy" = auth.jwt() ->> 'email');
+
+drop policy if exists "chat_sessions_insert_own" on public.chat_sessions;
+create policy "chat_sessions_insert_own"
+  on public.chat_sessions
+  for insert
+  with check ("createdBy" = auth.jwt() ->> 'email');
+
+drop policy if exists "chat_sessions_update_own" on public.chat_sessions;
+create policy "chat_sessions_update_own"
+  on public.chat_sessions
+  for update
+  using ("createdBy" = auth.jwt() ->> 'email')
+  with check ("createdBy" = auth.jwt() ->> 'email');
+
+drop policy if exists "chat_sessions_delete_own" on public.chat_sessions;
+create policy "chat_sessions_delete_own"
+  on public.chat_sessions
+  for delete
+  using ("createdBy" = auth.jwt() ->> 'email');
+```
+
+## 2. Vector Search Schema
+
+Run this to create the `documents` table and `match_documents` RPC used by the RAG flow:
 
 ```sql
 create extension if not exists vector;
-```
 
-## 2. Create the `documents` Table
-
-```sql
-create table if not exists documents (
+create table if not exists public.documents (
   id uuid primary key default gen_random_uuid(),
   content text not null,
   metadata jsonb default '{}'::jsonb,
@@ -21,15 +90,10 @@ create table if not exists documents (
   created_at timestamptz default now()
 );
 
-create index on documents using hnsw (embedding halfvec_cosine_ops);
-```
+create index if not exists documents_embedding_hnsw_idx
+  on public.documents using hnsw (embedding halfvec_cosine_ops);
 
-> `gemini-embedding-001` returns 3072 dimensions by default, and the current app expects `halfvec(3072)` end to end.
-
-## 3. Create the `match_documents` RPC Function
-
-```sql
-create or replace function match_documents (
+create or replace function public.match_documents (
   query_embedding halfvec(3072),
   match_threshold float,
   match_count int
@@ -47,64 +111,39 @@ as $$
     documents.content,
     documents.metadata,
     1 - (documents.embedding <=> query_embedding) as similarity
-  from documents
+  from public.documents
   where 1 - (documents.embedding <=> query_embedding) > match_threshold
   order by documents.embedding <=> query_embedding
   limit match_count;
 $$;
 ```
 
-Use Gemini `RETRIEVAL_DOCUMENT` for ingested documents and Gemini `RETRIEVAL_QUERY` for browser-side search queries.
+The current app expects `halfvec(3072)` because the ingestion pipeline uses Gemini `gemini-embedding-001`.
 
-## 4. Insert Sample Documents
+## 3. Helper SQL Files In This Repo
 
-```sql
-insert into documents (content, metadata, embedding)
-values
-(
-  'React is a JavaScript library for building user interfaces. It was created by Facebook (now Meta). Key concepts include JSX, Virtual DOM, hooks like useState and useEffect, and one-way data binding.',
-  '{"topic": "react", "source": "knowledge-base"}'::jsonb,
-  (select array_agg(0.1 + (i % 10) * 0.001) from generate_series(1, 3072) as s(i))::halfvec
-),
-(
-  'Supabase is an open source Firebase alternative. It provides a PostgreSQL database, authentication, instant APIs, edge functions, realtime subscriptions, storage, and vector embeddings via pgvector.',
-  '{"topic": "supabase", "source": "knowledge-base"}'::jsonb,
-  (select array_agg(0.5 + (i % 10) * 0.001) from generate_series(1, 3072) as s(i))::halfvec
-),
-(
-  'Gemini is a family of multimodal AI models developed by Google DeepMind. The embedding model gemini-embedding-001 produces 3072-dimensional vectors by default.',
-  '{"topic": "gemini", "source": "knowledge-base"}'::jsonb,
-  (select array_agg(0.9 + (i % 10) * 0.001) from generate_series(1, 3072) as s(i))::halfvec
-);
-```
+- [`setup_rag_text_embedding.sql`](./setup_rag_text_embedding.sql): Full dev bootstrap for `documents` and `match_documents`, plus sample vector rows. Use with care because it drops and recreates the `documents` table.
+- [`seed_data.sql`](./seed_data.sql): Inserts generated sample project docs after the vector schema already exists. Good for demos and testing.
 
-## 5. Quick Test
+If you want the safest path, create the schema manually first, then use the helper files only on development data.
 
-```sql
-select * from match_documents(
-  (select array_agg(0.1 + (i % 10) * 0.001) from generate_series(1, 3072) as s(i))::halfvec,
-  0.0,
-  5
-);
-```
+## 4. What Connects To What
 
-This should return all 3 documents. If you get `[]`, make sure you ran the schema successfully first.
+| Piece | Used by |
+| --- | --- |
+| `chat_sessions` | Authenticated chat history in the web app |
+| `documents` | Embedded knowledge-base chunks |
+| `match_documents` | Vector search during chat |
+| RLS policies | Prevent users from reading each other's chat history |
 
-## 6. One-Time Reset After the FAQ Loader Fix
+## 5. After Setup
 
-If `faq.json` was previously indexed as raw text, do this once:
+1. Start the web app from `src/Web`.
+2. Run the embedding pipeline from `src/EmbeddingPipeline`.
+3. Open `/chat` and ask questions against your indexed data.
 
-1. `delete from public.documents;`
-2. Remove `EmbeddingPipeline/data/record_manager.db`
-3. Re-run the embedding pipeline
+## Related Docs
 
-After reindexing, FAQ rows should appear as individual records:
-
-```sql
-select
-  metadata->>'document_type' as document_type,
-  metadata->>'faq_id' as faq_id,
-  metadata->>'question' as question
-from public.documents
-where metadata->>'document_type' = 'faq';
-```
+- [Web integration setup](./README-INTEGRATION.md)
+- [Embeddings and RAG basics](./README-EMBEDDINGS.md)
+- [Embedding pipeline guide](../EmbeddingPipeline/README.md)

@@ -1,106 +1,100 @@
-# Chat-RAG Integration Guide
+# Web App Integration Guide
 
-## Environment Variables
+This is the setup guide for the React app in `src/Web`.
 
-Add these to your `.env.local` file:
+The app uses Supabase for auth, chat history, and vector search. It uses one AI provider at a time for chat plus query embeddings: Gemini for cloud, or Ollama for local inference.
 
-| Variable                 | Description            | Where to get it                           |
-| ------------------------ | ---------------------- | ----------------------------------------- |
-| `VITE_SUPABASE_URL`      | Supabase project URL   | Dashboard → Settings → API                |
-| `VITE_SUPABASE_ANON_KEY` | Supabase anonymous key | Dashboard → Settings → API                |
-| `VITE_GEMINI_API_KEY`    | Base64 encoded API key | Run `btoa('YOUR_KEY')` in browser console |
+## Supported Providers Today
 
-### 🔐 Security & configuration
+| Provider | Type | What it does in this repo |
+| --- | --- | --- |
+| Gemini | Managed cloud | Chat responses and query embeddings in the browser |
+| Ollama | Local runtime | Chat responses and query embeddings from your local machine |
 
-**IMPORTANT:** Since this is a client-side application, your API key is visible to anyone inspecting the network traffic.
+The ingestion pipeline in [`../EmbeddingPipeline/README.md`](../EmbeddingPipeline/README.md) currently uses Gemini embeddings when indexing documents.
 
-1.  **Obfuscation (Step 1)**: We use Base64 encoding to prevent automated GitHub secret scanners from revoking your key instantly.
-    - Open your browser developer tools (F12) -> Console.
-    - Type `btoa('YOUR_ACTUAL_GOOGLE_API_KEY')` and press Enter.
-    - Copy the output string.
-    - Paste it into `.env.local` as `VITE_GEMINI_API_KEY=...`
-
-2.  **Restriction (Step 2 - GOLD STANDARD)**: You **MUST** restrict your API key in the Google Cloud Console to prevent unauthorized usage.
-    - Go to [Google Cloud Console > Credentials](https://console.cloud.google.com/apis/credentials).
-    - Click on your API Key.
-    - Under **Application restrictions**, select **Websites**.
-    - Add your deployed domain (e.g., `https://your-app.vercel.app/*`) and `http://localhost:5173/*` for development.
-    - This ensures that even if someone steals your key, they cannot use it from a different website.
-
-## RAG Pipeline Architecture
-
-```
-User Input
-    │
-    ▼
-┌───────────────────┐
-│  1. Embed Query   │  → Gemini gemini-embedding-001 (RETRIEVAL_QUERY) → 3072-dim vector
-└───────┬───────────┘
-        │
-        ▼
-┌───────────────────┐
-│  2. Vector Search │  → Supabase match_documents RPC on `halfvec(3072)`
-└───────┬───────────┘
-        │
-        ▼
-┌───────────────────┐
-│  3. KB Resolve    │  → Deterministic FAQ / KB answer on strong knowledge hits
-└───────┬───────────┘
-        │
-        ▼
-┌───────────────────┐
-│  4. Generate      │  → Gemini gemini-3-flash-preview only when KB does not fully answer
-└───────┬───────────┘
-        │
-        ▼
-   Chat UI Response
-```
-
-## Dependency Audit
-
-| Package                 | Version   | Purpose                     | Status            |
-| ----------------------- | --------- | --------------------------- | ----------------- |
-| `@supabase/supabase-js` | `^2.45.0` | Supabase client, vector RPC | Already installed |
-| `@google/generative-ai` | `latest`  | Gemini embeddings + chat    | **New**           |
-| `react`                 | `^18.3.1` | UI framework                | Already installed |
-| `react-router-dom`      | `^6.26.0` | Routing                     | Already installed |
-| `@chakra-ui/react`      | `^2.8.2`  | UI components               | Already installed |
-
-## File Structure
-
-```
-src/
-├── types/
-│   ├── chat.ts              # ChatMessage, SupabaseDocument, RagContext
-│   └── database.ts          # Updated with documents table + RPC types
-├── services/
-│   ├── gemini.ts            # Embedding + chat completion service
-│   └── rag.ts               # RAG pipeline orchestrator
-├── hooks/
-│   └── useChatRag.ts        # Chat state + RAG workflow hook
-├── components/
-│   └── chat/
-│       ├── ChatMessage.tsx   # Chat bubble component
-│       └── ChatInput.tsx     # Input bar component
-├── pages/
-│   └── ChatRag.tsx          # Full chat page
-└── ...
-```
-
-## Quick Start
+## Install And Run
 
 ```bash
-# 1. Install dependencies
+cd src/Web
 npm install
-
-# 2. Set up your .env.local (see above)
-
-# 3. Run the Supabase SQL scripts (see README-SUPABASE.md)
-
-# 4. Reindex the embedding corpus after enabling the FAQ-aware loader
-
-# 5. Start the dev server
-npm run start
-
-# 6. Navigate to /chat after signing in
+cp .env.example .env.local
+npm start
 ```
+
+Useful extras:
+
+```bash
+npm run lint
+npm run build
+```
+
+## Minimal Environment Setup
+
+The app reads these values from `.env.local`.
+
+### Option 1: Gemini
+
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+
+VITE_AI_PROVIDER=gemini
+VITE_GEMINI_API_KEY=your-gemini-key
+VITE_GEMINI_CHAT_MODEL=gemini-3-flash-preview
+VITE_GEMINI_EMBEDDING_MODEL=gemini-embedding-001
+```
+
+Notes:
+
+- `VITE_GEMINI_API_KEY` can be raw or Base64-encoded. The app accepts both, but raw is simpler.
+- Because this is a browser app, restrict your Gemini key to allowed origins before shipping.
+
+### Option 2: Ollama
+
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+
+VITE_AI_PROVIDER=ollama
+VITE_OLLAMA_BASE_URL=http://localhost:11434
+VITE_OLLAMA_CHAT_MODEL=llama3.2
+VITE_OLLAMA_EMBEDDING_MODEL=nomic-embed-text
+```
+
+Before starting the app, make sure Ollama is running and the models are available:
+
+```bash
+ollama pull llama3.2
+ollama pull nomic-embed-text
+ollama serve
+```
+
+## Chat Modes
+
+| Mode | What it means |
+| --- | --- |
+| `All` | Search the knowledge base first, then let the LLM fill gaps if needed. |
+| `Only knowledge base` | Answer only from retrieved knowledge-base content. |
+| `Only LLM chat` | Skip retrieval and talk directly to the selected model. |
+
+## Current Runtime Flow
+
+1. The user sends a message from `ChatInput`.
+2. The active provider creates a query embedding.
+3. Supabase runs `match_documents` against the `documents` table.
+4. The app reranks the matches and checks for strong FAQ-style hits.
+5. If the KB fully answers, it returns a grounded response.
+6. Otherwise, the provider generates a final reply with retrieved context attached.
+
+## Good To Know
+
+- The provider is selected by `VITE_AI_PROVIDER`, so only one provider is active at a time.
+- Chat history lives in Supabase `chat_sessions`, not in the model provider.
+- Local Ollama keeps model inference local, but your data is still in Supabase unless you also host storage privately.
+
+## Related Docs
+
+- [Embeddings and RAG basics](./README-EMBEDDINGS.md)
+- [Supabase and pgvector setup](./README-SUPABASE.md)
+- [Provider and privacy choices](./README-PROVIDERS.md)

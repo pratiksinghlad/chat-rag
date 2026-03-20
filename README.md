@@ -1,130 +1,99 @@
 # Chat RAG Web
 
-A React + Vite + TypeScript application with Supabase Auth, provider-agnostic AI chat, retrieval-augmented generation, and persisted chat history. Users can authenticate, start a new conversation, resume old conversations by URL, search their own chat history, and continue where they left off.
+Bring your docs, ask a question, and let the app do the scavenger hunt.
 
-## Architecture Overview
+This repo is a learn-by-building RAG project with a React web app, Supabase auth + vector search, and a Python embedding pipeline. You can run it with a cloud model through Gemini or a local model through Ollama.
 
-The app is organized into four main layers:
+## What This Project Does
 
-- `src/context`
-  - `AuthContext` manages the authenticated Supabase session.
-  - `ChatHistoryContext` manages recent chats, search, pagination, and mutation methods for persisted conversations.
-- `src/services/ai`
-  - `IChatService` and `IEmbeddingService` define the provider-neutral contract.
-  - `Gemini*Service` and `Ollama*Service` implement provider-specific chat and embedding behavior.
-  - `factory.ts` selects the active provider from environment variables.
-- `src/services/rag`
-  - `RagChatService` composes embeddings, Supabase vector search, and the active chat provider.
-  - `vector-search.repository.ts` keeps `pgvector` retrieval isolated from the LLM implementation.
-- `src/services/chat-history`
-  - `SupabaseChatHistoryRepository` handles chat session create/load/append/list operations against the `chat_sessions` table.
-  - Message/title helpers convert between persisted JSON and UI-friendly message shapes.
+- Sign users in with Supabase OAuth.
+- Save chat history in Postgres.
+- Search embedded knowledge-base documents with `pgvector`.
+- Answer with your knowledge base first, then fall back to the LLM when needed.
 
-At runtime, the flow is:
+## How It Works
 
-1. User opens `/chat` for a new conversation or `/chat/:chatId` for an existing one.
-2. The chat page loads persisted messages from `chat_sessions` when `chatId` is present.
-3. On the first user message, the app creates a new session and navigates to `/chat/:chatId`.
-4. Every user/assistant turn is appended to the `messages` JSONB array.
-5. The sidebar shows the current user’s recent chats, supports title search, and pages in groups of 10.
+1. A user signs in and opens the chat page.
+2. The app embeds the question.
+3. Supabase runs `match_documents` to find similar chunks.
+4. Strong FAQ-style matches can answer directly.
+5. Otherwise, the LLM answers with retrieved context attached.
 
-## Environment Variables
+## Project Structure
 
-Create `.env.local` in the project root:
-
-```env
-VITE_SUPABASE_URL=https://your-project-ref.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-
-VITE_AI_PROVIDER=gemini
-VITE_GEMINI_API_KEY=your-gemini-key
-VITE_GEMINI_CHAT_MODEL=gemini-3-flash-preview
-VITE_GEMINI_EMBEDDING_MODEL=gemini-embedding-001
-
-VITE_OLLAMA_BASE_URL=http://localhost:11434
-VITE_OLLAMA_CHAT_MODEL=llama3.2
-VITE_OLLAMA_EMBEDDING_MODEL=nomic-embed-text
+```text
+chat-rag-web/
+|-- README.md
+`-- src/
+    |-- Web/
+    |   |-- src/                    # React + Vite app
+    |   |-- public/documents/       # Sample knowledge-base files shown in the UI
+    |   |-- README-INTEGRATION.md   # Web app setup
+    |   |-- README-EMBEDDINGS.md    # Embeddings + RAG basics
+    |   |-- README-SUPABASE.md      # Supabase + pgvector setup
+    |   `-- README-PROVIDERS.md     # Cloud vs local vs public AI choices
+    `-- EmbeddingPipeline/
+        |-- main.py                 # Ingestion entry point
+        |-- src/                    # Loaders, splitter, indexing, vector store
+        `-- README.md               # Pipeline setup and usage
 ```
 
-Use `.env.example` as the starter template.
+## Main App Pieces
 
-## Supabase SQL Setup
+| Area | Main files/components | Job |
+| --- | --- | --- |
+| Layout | `AppShell`, `Header`, `Sidebar` | App shell, navigation, recent chats |
+| Chat UI | `ChatRagPage`, `ChatInput`, `ChatMessage` | Ask questions and render answers |
+| Auth | `AuthContext`, `OAuthButton`, `LandingPage` | Sign in with Supabase OAuth |
+| Chat history | `ChatHistoryContext`, `repository.ts` | Create, load, search, and delete chats |
+| AI + RAG | `factory.ts`, `rag-chat.service.ts`, `vector-search.repository.ts` | Pick provider, retrieve context, generate replies |
 
-Run the following SQL in the Supabase SQL editor to create the persisted chat history table, indexes, and row-level security policies:
+## Components And Tools Used
 
-```sql
-create extension if not exists pg_trgm;
+| Layer | Used here |
+| --- | --- |
+| Frontend | React, TypeScript, Vite, Chakra UI, Framer Motion |
+| Auth + data | Supabase Auth, Supabase Postgres |
+| Vector DB | Postgres + `pgvector` via Supabase RPC |
+| LLM providers | Gemini, Ollama |
+| Ingestion pipeline | Python, LangChain, Supabase vector store |
 
-create table if not exists public.chat_sessions (
-  id uuid primary key default gen_random_uuid(),
-  "createdBy" text not null,
-  title text not null,
-  "creationDate" timestamptz not null default now(),
-  "lastActivityDate" timestamptz not null default now(),
-  messages jsonb not null default '[]'::jsonb,
-  constraint chat_sessions_messages_is_array
-    check (jsonb_typeof(messages) = 'array')
-);
+## Choose Your Setup
 
-create index if not exists chat_sessions_createdBy_lastActivityDate_idx
-  on public.chat_sessions ("createdBy", "lastActivityDate" desc);
+| If you want... | Pick this | Repo support | Read next |
+| --- | --- | --- | --- |
+| Fastest cloud demo | Gemini + Supabase | Supported now | [Web integration](src/Web/README-INTEGRATION.md) |
+| Local model inference | Ollama + Supabase | Supported now | [Web integration](src/Web/README-INTEGRATION.md) |
+| Embeddings and RAG basics | Gemini pipeline + Supabase `documents` | Supported now | [Embeddings guide](src/Web/README-EMBEDDINGS.md) |
+| Supabase schema and SQL setup | Auth + chat history + `pgvector` | Supported now | [Supabase guide](src/Web/README-SUPABASE.md) |
+| Privacy and provider tradeoffs | Cloud vs local vs public AI | Guide only | [Provider guide](src/Web/README-PROVIDERS.md) |
 
-create index if not exists chat_sessions_title_trgm_idx
-  on public.chat_sessions
-  using gin (title gin_trgm_ops);
+## Quick Start
 
-alter table public.chat_sessions enable row level security;
-
-drop policy if exists "chat_sessions_select_own" on public.chat_sessions;
-create policy "chat_sessions_select_own"
-  on public.chat_sessions
-  for select
-  using ("createdBy" = auth.jwt() ->> 'email');
-
-drop policy if exists "chat_sessions_insert_own" on public.chat_sessions;
-create policy "chat_sessions_insert_own"
-  on public.chat_sessions
-  for insert
-  with check ("createdBy" = auth.jwt() ->> 'email');
-
-drop policy if exists "chat_sessions_update_own" on public.chat_sessions;
-create policy "chat_sessions_update_own"
-  on public.chat_sessions
-  for update
-  using ("createdBy" = auth.jwt() ->> 'email')
-  with check ("createdBy" = auth.jwt() ->> 'email');
-
-drop policy if exists "chat_sessions_delete_own" on public.chat_sessions;
-create policy "chat_sessions_delete_own"
-  on public.chat_sessions
-  for delete
-  using ("createdBy" = auth.jwt() ->> 'email');
-```
-
-## Chat History Behavior
-
-- The first user prompt creates a new row in `chat_sessions`.
-- The chat title is generated locally from the first prompt by trimming whitespace and capping the length.
-- `messages` stores the ordered conversation as JSONB:
-  - `{ id, role, content, timestamp }`
-- Existing chats are resumed by loading `/chat/:chatId`.
-- The sidebar fetches the current user’s recent chats ordered by `"lastActivityDate"` descending.
-- Title search is case-insensitive, and “Load more” fetches the next 10 chats.
-- Users can only access their own chats through Supabase RLS on `"createdBy"`.
-
-## Running Locally
+### Web app
 
 ```bash
+cd src/Web
 npm install
-npm run lint
-npm run build
+cp .env.example .env.local
 npm start
 ```
 
-The app runs on `http://localhost:5173` by default.
+### Embedding pipeline
 
-## Notes
+```bash
+cd src/EmbeddingPipeline
+uv sync
+cp .env.example .env
+uv run main.py
+```
 
-- Chat history requires authenticated users with an email claim.
-- The warning beneath the chat input is intentional: prompts are sent to a cloud or local LLM provider depending on your selected configuration.
-- The SQL above assumes your Supabase/Postgres version supports `uuid` as requested.
+Use the pipeline when you want to index or re-index documents into Supabase.
+
+## Read More
+
+- [Web integration and provider setup](src/Web/README-INTEGRATION.md)
+- [Embeddings and RAG, explained simply](src/Web/README-EMBEDDINGS.md)
+- [Supabase and pgvector setup](src/Web/README-SUPABASE.md)
+- [Cloud, local, and public AI choices](src/Web/README-PROVIDERS.md)
+- [Embedding pipeline guide](src/EmbeddingPipeline/README.md)
