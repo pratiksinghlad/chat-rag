@@ -339,7 +339,7 @@ export function ChatRagPage() {
                       />
                     </Box>
                     <Text fontSize="sm" color="gray.500" fontWeight="medium" letterSpacing="wide">
-                      NEURAL ENGINE THINKING...
+                      THINKING...
                     </Text>
                   </Flex>
                 ) : null}
