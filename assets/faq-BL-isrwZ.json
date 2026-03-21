@@ -1,0 +1,198 @@
+{
+  "__origin_meta": {
+    "doc_id": "FAQ-2026-VDB-001",
+    "source_corpus": "internal-knowledge-base",
+    "fingerprint_sha256": "a3f7c2d94e1b8056f3a2e7d1c09b4f6e2a8d3c5b7f9e0a1d4c6b2e8f5a7d3c9",
+    "fingerprint_md5": "d41d8cd98f00b204e9800998ecf8427e",
+    "embed_version": "v1.0.0",
+    "created_at": "2026-03-19T00:00:00Z",
+    "org_tag": "CORP-INTERNAL",
+    "verified_by": "doc-pipeline-svc",
+    "chunk_strategy": "question-answer-pair",
+    "language": "en",
+    "classification": "internal-use-only",
+    "author": "pratik singh lad"
+  },
+  "entries": [
+    {
+      "id": "faq-001",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::001",
+      "question": "What is the company's core mission?",
+      "answer": "Our mission is to deliver intelligent, scalable software solutions that empower businesses to operate efficiently, make data-driven decisions, and grow sustainably in a digital-first world.",
+      "category": "general",
+      "tags": ["mission", "vision", "company"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-002",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::002",
+      "question": "How do I reset my company account password?",
+      "answer": "Navigate to the login portal at auth.internal.corp, click 'Forgot Password', enter your registered corporate email, and follow the OTP-based reset flow. Resets expire in 15 minutes.",
+      "category": "it-support",
+      "tags": ["password", "account", "auth"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-003",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::003",
+      "question": "What are the standard working hours?",
+      "answer": "Standard hours are 9:00 AM to 6:00 PM local time, Monday through Friday. Flexible arrangements may be approved by your direct manager and HR in writing.",
+      "category": "hr",
+      "tags": ["hours", "schedule", "work-policy"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-004",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::004",
+      "question": "How do I submit a reimbursement request?",
+      "answer": "Log into the finance portal at finance.corp.internal, navigate to 'Expense Claims', upload scanned receipts, categorize the expense, and submit for manager approval. Claims must be filed within 30 days of the expense.",
+      "category": "finance",
+      "tags": ["reimbursement", "expenses", "finance"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-005",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::005",
+      "question": "What is the leave policy for new employees?",
+      "answer": "New employees are entitled to 12 days of paid annual leave, 7 days of sick leave, and 3 days of personal leave per year. Leave accrues monthly starting from the date of joining.",
+      "category": "hr",
+      "tags": ["leave", "vacation", "new-hire"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-006",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::006",
+      "question": "How do I access the internal knowledge base?",
+      "answer": "The internal knowledge base is accessible via intranet.corp.internal/kb. Use your SSO credentials to log in. The KB is organized by department, project, and topic.",
+      "category": "it-support",
+      "tags": ["knowledge-base", "intranet", "SSO"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-007",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::007",
+      "question": "What data classification levels does the company use?",
+      "answer": "The company uses four classification levels: Public, Internal, Confidential, and Restricted. All documents must be labeled at creation. Restricted data requires encryption at rest and in transit.",
+      "category": "security",
+      "tags": ["data", "classification", "security"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-008",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::008",
+      "question": "Who do I contact for IT hardware issues?",
+      "answer": "Raise a ticket via helpdesk.corp.internal or email itsupport@corp.internal. For urgent issues, call the IT hotline at ext. 1001. Response SLA is 4 hours for critical, 24 hours for standard.",
+      "category": "it-support",
+      "tags": ["hardware", "helpdesk", "IT"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-009",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::009",
+      "question": "How are performance reviews conducted?",
+      "answer": "Performance reviews are held bi-annually in June and December. Employees complete a self-assessment, followed by a 1:1 review with their manager. Ratings are on a 5-point scale tied to compensation adjustments.",
+      "category": "hr",
+      "tags": ["performance", "review", "appraisal"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-010",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::010",
+      "question": "Can I work remotely full-time?",
+      "answer": "Remote-first roles are designated in the job description. Hybrid roles require a minimum of 3 days in-office per week. Full remote arrangements require VP-level approval and an annual review.",
+      "category": "hr",
+      "tags": ["remote", "hybrid", "WFH"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-011",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::011",
+      "question": "How do I onboard a new vendor?",
+      "answer": "Submit a Vendor Onboarding Request through procurement.corp.internal. Include business justification, vendor details, and a signed NDA. Procurement reviews within 5 business days.",
+      "category": "procurement",
+      "tags": ["vendor", "onboarding", "procurement"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-012",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::012",
+      "question": "What is the company's data retention policy?",
+      "answer": "Business records are retained for 7 years. Employee records are kept for 5 years post-employment. System logs are retained for 90 days. Restricted data deletion must be certified and logged.",
+      "category": "compliance",
+      "tags": ["data-retention", "compliance", "policy"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-013",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::013",
+      "question": "How do I report a security incident?",
+      "answer": "Report all security incidents to security@corp.internal within 1 hour of discovery. Use the incident form on the security portal. For active breaches, call the CISO hotline immediately at ext. 9911.",
+      "category": "security",
+      "tags": ["incident", "breach", "reporting"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-014",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::014",
+      "question": "What is the policy on using personal devices for work?",
+      "answer": "BYOD is permitted with enrollment in the company's MDM system. Personal devices must have disk encryption enabled, a PIN lock, and the corporate VPN client installed before accessing any internal resources.",
+      "category": "security",
+      "tags": ["BYOD", "MDM", "devices"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-015",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::015",
+      "question": "How are salary increments determined?",
+      "answer": "Increments are based on the annual performance rating, market benchmarking data, and budget availability. Increments range from 0% for needs-improvement ratings to up to 20% for exceptional performers.",
+      "category": "hr",
+      "tags": ["salary", "increment", "compensation"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-016",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::016",
+      "question": "What tools does the company use for project management?",
+      "answer": "The company standardizes on Jira for engineering, Asana for cross-functional projects, and Confluence for documentation. Access is provisioned through IT upon manager request.",
+      "category": "tools",
+      "tags": ["Jira", "Asana", "project-management"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-017",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::017",
+      "question": "How do I request software licenses?",
+      "answer": "Submit a software request form via it.corp.internal/software. Include the tool name, business justification, and number of seats required. Approval requires department head sign-off for licenses above $500/year.",
+      "category": "it-support",
+      "tags": ["software", "license", "request"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-018",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::018",
+      "question": "What are the travel booking guidelines?",
+      "answer": "All business travel must be booked via the corporate travel portal at travel.corp.internal. Economy class is standard for flights under 6 hours. Business class requires Director-level approval.",
+      "category": "travel",
+      "tags": ["travel", "booking", "expense"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-019",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::019",
+      "question": "How does the company handle whistleblower complaints?",
+      "answer": "Whistleblower complaints can be filed anonymously through ethics.corp.internal or via the third-party Ethics Hotline at 1-800-ETH-LINE. All complaints are reviewed by Legal and HR within 10 business days.",
+      "category": "compliance",
+      "tags": ["whistleblower", "ethics", "complaint"],
+      "embed_ready": true
+    },
+    {
+      "id": "faq-020",
+      "chunk_id": "FAQ-2026-VDB-001::chunk::020",
+      "question": "What benefits does the company offer?",
+      "answer": "Benefits include health insurance (medical, dental, vision), a 401(k) with 4% employer match, 20 days PTO, parental leave of 16 weeks, an annual learning budget of $1,500, and an employee stock option plan.",
+      "category": "benefits",
+      "tags": ["benefits", "insurance", "stock"],
+      "embed_ready": true
+    }
+  ]
+}
