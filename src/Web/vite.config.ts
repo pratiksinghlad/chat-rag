@@ -4,7 +4,7 @@ import { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/chat-rag-web/',
+  base: '/chat-rag/',
   plugins: [react()],
   resolve: {
     alias: {
@@ -23,7 +23,6 @@ export default defineConfig({
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
           supabase: ['@supabase/supabase-js'],
-          gemini: ['@google/generative-ai'],
         },
       },
     },

@@ -52,7 +52,7 @@ Create `.env` from `.env.example` and set:
 
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `GOOGLE_API_KEY`
+- `GEMINI_API_KEY`
 
 ## Database requirements
 
@@ -123,19 +123,19 @@ Run it a second time without changing files and unchanged chunks should be skipp
 
 These settings are supported:
 
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `SUPABASE_URL` | required | Supabase project URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | required | Service role key |
-| `GOOGLE_API_KEY` | required | Gemini API key |
-| `EMBEDDING_MODEL` | `gemini-embedding-001` | Embedding model |
-| `EMBEDDING_DIMENSIONS` | `3072` | Expected vector size |
-| `CHUNK_SIZE` | `1000` | Max characters per chunk |
-| `CHUNK_OVERLAP` | `200` | Overlap between chunks |
-| `DATA_DIR` | `data/documents` | Input directory |
-| `RECORD_MANAGER_DB_URL` | `sqlite:///data/record_manager.db` | Local incremental index store |
-| `RECORD_MANAGER_NAMESPACE` | `supabase/documents_v2` | Cache namespace for this pipeline version |
-| `LOG_LEVEL` | `INFO` | Logging level |
+| Variable                    | Default                            | Purpose                                   |
+| --------------------------- | ---------------------------------- | ----------------------------------------- |
+| `SUPABASE_URL`              | required                           | Supabase project URL                      |
+| `SUPABASE_SERVICE_ROLE_KEY` | required                           | Service role key                          |
+| `GEMINI_API_KEY`            | required                           | Gemini API key                            |
+| `EMBEDDING_MODEL`           | `gemini-embedding-001`             | Embedding model                           |
+| `EMBEDDING_DIMENSIONS`      | `3072`                             | Expected vector size                      |
+| `CHUNK_SIZE`                | `1000`                             | Max characters per chunk                  |
+| `CHUNK_OVERLAP`             | `200`                              | Overlap between chunks                    |
+| `DATA_DIR`                  | `data/documents`                   | Input directory                           |
+| `RECORD_MANAGER_DB_URL`     | `sqlite:///data/record_manager.db` | Local incremental index store             |
+| `RECORD_MANAGER_NAMESPACE`  | `supabase/documents_v2`            | Cache namespace for this pipeline version |
+| `LOG_LEVEL`                 | `INFO`                             | Logging level                             |
 
 Removed configuration:
 

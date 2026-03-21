@@ -11,7 +11,8 @@ const CHAT_TITLE_MAX_LENGTH = 60;
 export function createStoredChatMessage(
   role: StoredChatMessage['role'],
   content: string,
-  isGrounded?: boolean
+  isGrounded?: boolean,
+  mode?: StoredChatMessage['mode']
 ): StoredChatMessage {
   return {
     id: crypto.randomUUID(),
@@ -19,6 +20,7 @@ export function createStoredChatMessage(
     content,
     timestamp: new Date().toISOString(),
     isGrounded,
+    mode,
   };
 }
 
@@ -42,6 +44,7 @@ export function toUiMessages(messages: StoredChatMessage[]): ChatMessage[] {
     content: message.content,
     timestamp: new Date(message.timestamp),
     isGrounded: message.isGrounded,
+    mode: message.mode,
   }));
 }
 

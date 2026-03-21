@@ -1,6 +1,6 @@
 import type { ChatMode } from '@/services/ai/chat-mode';
 
-export type AIProvider = 'gemini' | 'ollama';
+export type AIProvider = 'gemini';
 
 export interface ChatHistoryMessage {
   role: 'user' | 'assistant';

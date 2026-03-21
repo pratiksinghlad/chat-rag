@@ -1,5 +1,4 @@
 import { Box, Flex, Text, useColorModeValue, Tag, TagLabel } from "@chakra-ui/react";
-// import { FiDatabase, FiCpu } from "react-icons/fi";
 import type { ChatMessage as ChatMessageType } from "@/types/chat";
 
 interface ChatMessageProps {
@@ -29,21 +28,32 @@ export function ChatMessageBubble({ message }: ChatMessageProps) {
         boxShadow="sm"
         position="relative"
       >
-        {!isUser && !isError && (
-          <Box mt={3} pt={2}>
-            {message.isGrounded ? (
-              <Tag size="sm" variant="subtle" colorScheme="green" borderRadius="full" px={2}>
-                {/* <Icon as={FiDatabase} mr={1} /> */}
-                <TagLabel fontWeight="medium">from knowledge base</TagLabel>
-              </Tag>
-            ) : (
-              <Tag size="sm" variant="subtle" colorScheme="red" borderRadius="full" px={2}>
-                {/* <Icon as={FiCpu} mr={1} /> */}
-                <TagLabel fontWeight="medium">not from knowledge base</TagLabel>
+        {!isError && (
+          <Flex mb={2} gap={2} flexWrap="wrap" align="center">
+            {message.mode && (
+              <Tag size="sm" variant="solid" colorScheme="purple" borderRadius="full" px={2} py={0.5}>
+                <TagLabel fontWeight="bold" fontSize="xs" textTransform="uppercase">
+                  {message.mode === 'all' ? 'All' : 
+                   message.mode === 'knowledge-base' ? 'Only Knowledge Base' : 
+                   message.mode === 'llm-chat' ? 'Only LLM Chat' : message.mode}
+                </TagLabel>
               </Tag>
             )}
-          </Box>
+
+            {!isUser && (
+              message.isGrounded ? (
+                <Tag size="sm" variant="subtle" colorScheme="green" borderRadius="full" px={2}>
+                  <TagLabel fontWeight="medium">from knowledge base</TagLabel>
+                </Tag>
+              ) : (
+                <Tag size="sm" variant="subtle" colorScheme="red" borderRadius="full" px={2}>
+                  <TagLabel fontWeight="medium">not from knowledge base</TagLabel>
+                </Tag>
+              )
+            )}
+          </Flex>
         )}
+        
         <Text
           fontSize="sm"
           whiteSpace="pre-wrap"

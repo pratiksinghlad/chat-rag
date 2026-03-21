@@ -111,7 +111,7 @@ export function useChatRag(): UseChatRagReturn {
         return;
       }
 
-      const userMessage = createStoredChatMessage('user', trimmed);
+      const userMessage = createStoredChatMessage('user', trimmed, false, input.mode);
       const optimisticUserMessage = toUiMessages([userMessage])[0];
       setError(null);
       setMessages((currentMessages) => [...currentMessages, optimisticUserMessage]);
@@ -144,7 +144,8 @@ export function useChatRag(): UseChatRagReturn {
         const assistantMessage = createStoredChatMessage(
           'assistant',
           response.text,
-          response.isGrounded
+          response.isGrounded,
+          input.mode
         );
         const updatedSession = await appendMessages(session.id, [
           assistantMessage,

@@ -12,10 +12,13 @@
       name="keywords"
       content="Chat-RAG Web, SSO, Single Sign-On, OAuth, Authentication, Supabase"
     />
-    <link rel="canonical" href="https://pratiksinghlad.github.io/chat-rag-web/" />
+    <link rel="canonical" href="https://pratiksinghlad.github.io/chat-rag/" />
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://pratiksinghlad.github.io/chat-rag-web/" />
+    <meta
+      property="og:url"
+      content="https://pratiksinghlad.github.io/chat-rag/"
+    />
     <title>Chat-RAG Web - Secure Authentication</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,6 +28,10 @@
     />
   </head>
   <body>
+    <script>
+      // Force light mode
+      localStorage.setItem('chakra-ui-color-mode', 'light');
+    </script>
     <div id="root"></div>
     <script type="module" src="./src/main.tsx"></script>
   </body>
