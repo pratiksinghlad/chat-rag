@@ -2,7 +2,7 @@
 
 Bring your docs/data, ask a question, and let the app do the scavenger hunt.
 
-This repository is a learn-by-building RAG project centered on a dummy company knowledge base. It provides a chat experience for answering internal company questions as well as interacting directly with an LLM provider.
+This repository is a learn-by-building RAG(Retrieval-Augmented Generation) project centered on a dummy company knowledge base. It provides a chat experience for answering internal company questions as well as interacting directly with an LLM provider.
 
 The stack includes a React web app, Supabase authentication and vector search, a Python-based embedding pipeline, and Supabase Edge Functions used as a proxy API to securely handle requests without exposing secrets in the client. It supports both cloud models through Gemini and local models through Ollama.
 
@@ -13,7 +13,6 @@ Instead of building a custom chat UI from scratch, you can also use existing ope
 
 > [!NOTE]
 > **Performance & Hosting**: This project is optimized for the **Free Tiers** of Supabase and Google AI Studio. You may experience some latency due to the shared infrastructure. For enhanced performance and privacy, you can transition to **Enterprise tiers**, **On-Premise hosting**, or **Local models** via Ollama.
-
 
 ## What This Project Does
 
@@ -36,6 +35,14 @@ Instead of building a custom chat UI from scratch, you can also use existing ope
    - **Simplified Frontend**: The React app focuses on the UI and history, making it perfect for rapid experimentation and small demo projects.
 6. **LLM Providers**: Google Gemini (Cloud) or Ollama (Local) generate responses based on the grounded context provided by the Edge Function.
 
+## Chat Modes
+
+| Mode                    | Behavior                                                                                                                                |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **All**                 | Checks embeddings first. If a strong match is found, it returns the answer directly. Otherwise, it uses the LLM with retrieved context. |
+| **Only Knowledge Base** | Strictly uses internal training data from `pgvector`. No fallback to LLM if data is missing.                                            |
+| **Only LLM Chat**       | Skips retrieval and interacts directly with the LLM provider for general purpose chat.                                                  |
+
 ## Project Structure
 
 ```text
@@ -57,14 +64,14 @@ chat-rag/
 
 ## Main App Pieces
 
-| Area         | Main files/components                                              | Job                                               |
-| ------------ | ------------------------------------------------------------------ | ------------------------------------------------- |
-| Layout       | `AppShell`, `Header`, `Sidebar`                                    | App shell, navigation, recent chats               |
-| Chat UI      | `ChatRagPage`, `ChatInput`, `ChatMessage`                          | Ask questions and render answers                  |
-| Auth         | `AuthContext`, `OAuthButton`, `LandingPage`                        | Sign in with Supabase OAuth                       |
-| Chat history | `ChatHistoryContext`, `repository.ts`                              | Create, load, search, and delete chats            |
-| AI Proxy     | `ai-proxy-chat-rag` (Supabase Edge Function)                      | Unified RAG, Grounding, and AI responses          |
-| Web Core     | `useChatRag.ts`, `ChatContext.tsx`                                 | Manage UI state and invoke the AI Proxy           |
+| Area         | Main files/components                        | Job                                      |
+| ------------ | -------------------------------------------- | ---------------------------------------- |
+| Layout       | `AppShell`, `Header`, `Sidebar`              | App shell, navigation, recent chats      |
+| Chat UI      | `ChatRagPage`, `ChatInput`, `ChatMessage`    | Ask questions and render answers         |
+| Auth         | `AuthContext`, `OAuthButton`, `LandingPage`  | Sign in with Supabase OAuth              |
+| Chat history | `ChatHistoryContext`, `repository.ts`        | Create, load, search, and delete chats   |
+| AI Proxy     | `ai-proxy-chat-rag` (Supabase Edge Function) | Unified RAG, Grounding, and AI responses |
+| Web Core     | `useChatRag.ts`, `ChatContext.tsx`           | Manage UI state and invoke the AI Proxy  |
 
 ## Components And Tools Used
 
@@ -115,3 +122,7 @@ Use the pipeline when you want to index or re-index documents into Supabase.
 - [Supabase and pgvector setup](src/Web/README-SUPABASE.md)
 - [Cloud, local, and public AI choices](src/Web/README-PROVIDERS.md)
 - [Embedding pipeline guide](src/EmbeddingPipeline/README.md)
+
+## Chat UI
+
+![Chat UI](assets/chat_ui.png)

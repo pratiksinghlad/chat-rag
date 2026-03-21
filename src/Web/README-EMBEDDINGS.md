@@ -2,6 +2,8 @@
 
 This project uses embeddings to find useful knowledge-base chunks before the model answers. That is the heart of retrieval-augmented generation, or RAG.
 
+![RAG & Embedding Flow](../../assets/embedding_chat_rag.png)
+
 ## Tiny Glossary
 
 - **Embedding**: A list of numbers that captures the meaning of text, not just the exact words.
@@ -39,11 +41,11 @@ Embeddings compare meaning, not exact string matches, so a short query like `Rea
 
 ## Simple Score Guide
 
-| Score | Usually means |
-| --- | --- |
-| `0.75+` | Very close match or near-duplicate wording |
+| Score         | Usually means                                       |
+| ------------- | --------------------------------------------------- |
+| `0.75+`       | Very close match or near-duplicate wording          |
 | `0.60 - 0.74` | Strong semantic match and often good enough for RAG |
-| `Below 0.50` | Broader or weaker relation |
+| `Below 0.50`  | Broader or weaker relation                          |
 
 The web app currently searches with:
 
