@@ -1,4 +1,4 @@
-import type { ChatMode } from '@/services/ai/chat-mode';
+import type { ChatMode } from '@/types/chat-mode';
 
 export interface StoredChatMessage {
   id: string;

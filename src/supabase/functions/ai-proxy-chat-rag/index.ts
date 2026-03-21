@@ -180,7 +180,16 @@ Deno.serve(async (req: Request) => {
         hasGoodMatch = rankedDocs.some((d: any) => d.similarity >= DOCUMENT_MATCH_POLICY.minimumSimilarity);
       }
 
-      // Early Knowledge Base Overrides
+      // Early Knowledge Base Overrides (FAQ Matching)
+      if (chatMode === 'knowledge-base' || chatMode === 'all') {
+        if (strongMatch && strongMatch.metadata?.document_type === 'faq') {
+           const answer = strongMatch.metadata?.answer || strongMatch.content;
+           console.log("[AI-Proxy] Returning deterministic FAQ match.");
+           return new Response(JSON.stringify({ text: answer, contextDocuments: retrievedDocs, isGrounded: true }), 
+             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+      }
+
       if (chatMode === 'knowledge-base') {
         if (!hasGoodMatch) {
           console.log("[AI-Proxy] No good match found in KB mode. Returning fallback.");
@@ -189,12 +198,6 @@ Deno.serve(async (req: Request) => {
             contextDocuments: retrievedDocs, 
             isGrounded: false 
           }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-        }
-        if (strongMatch && strongMatch.metadata?.document_type === 'faq') {
-           const answer = strongMatch.metadata?.answer || strongMatch.content;
-           console.log("[AI-Proxy] Returning deterministic FAQ match.");
-           return new Response(JSON.stringify({ text: answer, contextDocuments: retrievedDocs, isGrounded: true }), 
-             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
         }
       }
 

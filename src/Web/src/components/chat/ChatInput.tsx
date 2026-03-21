@@ -18,7 +18,7 @@ import {
   CHAT_MODE_OPTIONS,
   DEFAULT_CHAT_MODE,
   type ChatMode,
-} from "@/services/ai/chat-mode";
+} from "@/types/chat-mode";
 
 interface ChatInputProps {
   onSend: (input: { message: string; mode: ChatMode }) => void | Promise<void>;

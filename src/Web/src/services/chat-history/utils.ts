@@ -1,4 +1,4 @@
-import type { ChatHistoryMessage } from '@/services/ai/types';
+import type { ChatHistoryMessage } from '@/types/ai';
 import type {
   ChatSessionDetail,
   ChatSessionSummary,
