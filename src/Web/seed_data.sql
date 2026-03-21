@@ -495,7 +495,7 @@ Add these to your `.env.local` file:
 
 1.  **Obfuscation (Step 1)**: We use Base64 encoding to prevent automated GitHub secret scanners from revoking your key instantly.
     - Open your browser developer tools (F12) -> Console.
-    - Type `btoa(''YOUR_ACTUAL_GOOGLE_API_KEY'')` and press Enter.
+    - Type `btoa(''YOUR_ACTUAL_GEMINI_API_KEY'')` and press Enter.
     - Copy the output string.
     - Paste it into `.env.local` as `VITE_GEMINI_API_KEY=...`
 

@@ -180,6 +180,7 @@ function parseMessages(value: unknown): StoredChatMessage[] {
           typeof candidate.isGrounded === 'boolean'
             ? candidate.isGrounded
             : undefined,
+        mode: candidate.mode,
       },
     ];
   });

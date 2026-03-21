@@ -122,7 +122,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { error: signInError } = await supabase.auth.signInWithOAuth({
         provider: providerMap[provider],
         options: {
-          // Redirect back to the app after OAuth (handles subpaths like /chat-rag-web/)
+          // Redirect back to the app after OAuth (handles subpaths like /chat-rag/)
           redirectTo: redirectUrl,
           // Request additional scopes for user info
           scopes: provider === "google" ? "email profile" : undefined,

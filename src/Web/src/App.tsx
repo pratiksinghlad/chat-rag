@@ -12,11 +12,12 @@ import LandingPage from "@/pages/LandingPage";
 import ProfilePage from "@/pages/ProfilePage";
 import ChatRagPage from "@/pages/ChatRagPage";
 import KnowledgeBaseDocuments from "@/pages/KnowledgeBaseDocuments";
+import theme from "@/theme";
 import "@/styles/index.css";
 
 function App() {
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <AuthProvider>
         <BrowserRouter basename={import.meta.env.BASE_URL}>
           <ChatHistoryProvider>

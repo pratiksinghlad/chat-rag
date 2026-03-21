@@ -23,7 +23,7 @@ class Settings(BaseSettings):
 
     supabase_url: str
     supabase_service_role_key: str
-    google_api_key: str
+    GEMINI_API_KEY: str
 
     embedding_model: str = "gemini-embedding-001"
     embedding_dimensions: int = 3072

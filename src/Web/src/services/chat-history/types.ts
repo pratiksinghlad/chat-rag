@@ -1,9 +1,12 @@
+import type { ChatMode } from '@/services/ai/chat-mode';
+
 export interface StoredChatMessage {
   id: string;
   role: 'user' | 'assistant' | 'error';
   content: string;
   timestamp: string;
   isGrounded?: boolean;
+  mode?: ChatMode;
 }
 
 export interface ChatSessionSummary {

@@ -35,7 +35,7 @@ def main() -> int:
     try:
         embeddings = create_embeddings(
             model=settings.embedding_model,
-            api_key=settings.google_api_key,
+            api_key=settings.GEMINI_API_KEY,
         )
         supabase_mgr = SupabaseManager(
             supabase_url=settings.supabase_url,

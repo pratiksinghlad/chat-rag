@@ -1,5 +1,5 @@
 {
-  "name": "chat-rag-web",
+  "name": "chat-rag",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -15,7 +15,6 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
-    "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.45.0",
     "dotenv": "^16.4.5",
     "framer-motion": "^11.0.8",

@@ -49,7 +49,7 @@ const DOCUMENTS: DocumentItem[] = Object.keys(globbedDocs).map((fullPath) => {
     .join(" ");
 
   // Final URL path must be relative to the served root and include BASE_URL
-  // Results in: /chat-rag-web/documents/faq.json
+  // Results in: /chat-rag/documents/faq.json
   const path = `${BASE_URL}/documents/${fileNameWithExt}`;
 
   return {

@@ -22,7 +22,7 @@ This repo is a learn-by-building RAG project with a React web app, Supabase auth
 ## Project Structure
 
 ```text
-chat-rag-web/
+chat-rag/
 |-- README.md
 `-- src/
     |-- Web/
@@ -40,33 +40,33 @@ chat-rag-web/
 
 ## Main App Pieces
 
-| Area | Main files/components | Job |
-| --- | --- | --- |
-| Layout | `AppShell`, `Header`, `Sidebar` | App shell, navigation, recent chats |
-| Chat UI | `ChatRagPage`, `ChatInput`, `ChatMessage` | Ask questions and render answers |
-| Auth | `AuthContext`, `OAuthButton`, `LandingPage` | Sign in with Supabase OAuth |
-| Chat history | `ChatHistoryContext`, `repository.ts` | Create, load, search, and delete chats |
-| AI + RAG | `factory.ts`, `rag-chat.service.ts`, `vector-search.repository.ts` | Pick provider, retrieve context, generate replies |
+| Area         | Main files/components                                              | Job                                               |
+| ------------ | ------------------------------------------------------------------ | ------------------------------------------------- |
+| Layout       | `AppShell`, `Header`, `Sidebar`                                    | App shell, navigation, recent chats               |
+| Chat UI      | `ChatRagPage`, `ChatInput`, `ChatMessage`                          | Ask questions and render answers                  |
+| Auth         | `AuthContext`, `OAuthButton`, `LandingPage`                        | Sign in with Supabase OAuth                       |
+| Chat history | `ChatHistoryContext`, `repository.ts`                              | Create, load, search, and delete chats            |
+| AI + RAG     | `factory.ts`, `rag-chat.service.ts`, `vector-search.repository.ts` | Pick provider, retrieve context, generate replies |
 
 ## Components And Tools Used
 
-| Layer | Used here |
-| --- | --- |
-| Frontend | React, TypeScript, Vite, Chakra UI, Framer Motion |
-| Auth + data | Supabase Auth, Supabase Postgres |
-| Vector DB | Postgres + `pgvector` via Supabase RPC |
-| LLM providers | Gemini, Ollama |
-| Ingestion pipeline | Python, LangChain, Supabase vector store |
+| Layer              | Used here                                         |
+| ------------------ | ------------------------------------------------- |
+| Frontend           | React, TypeScript, Vite, Chakra UI, Framer Motion |
+| Auth + data        | Supabase Auth, Supabase Postgres                  |
+| Vector DB          | Postgres + `pgvector` via Supabase RPC            |
+| LLM providers      | Gemini, Ollama                                    |
+| Ingestion pipeline | Python, LangChain, Supabase vector store          |
 
 ## Choose Your Setup
 
-| If you want... | Pick this | Repo support | Read next |
-| --- | --- | --- | --- |
-| Fastest cloud demo | Gemini + Supabase | Supported now | [Web integration](src/Web/README-INTEGRATION.md) |
-| Local model inference | Ollama + Supabase | Supported now | [Web integration](src/Web/README-INTEGRATION.md) |
-| Embeddings and RAG basics | Gemini pipeline + Supabase `documents` | Supported now | [Embeddings guide](src/Web/README-EMBEDDINGS.md) |
-| Supabase schema and SQL setup | Auth + chat history + `pgvector` | Supported now | [Supabase guide](src/Web/README-SUPABASE.md) |
-| Privacy and provider tradeoffs | Cloud vs local vs public AI | Guide only | [Provider guide](src/Web/README-PROVIDERS.md) |
+| If you want...                 | Pick this                              | Repo support  | Read next                                        |
+| ------------------------------ | -------------------------------------- | ------------- | ------------------------------------------------ |
+| Fastest cloud demo             | Gemini + Supabase                      | Supported now | [Web integration](src/Web/README-INTEGRATION.md) |
+| Local model inference          | Ollama + Supabase                      | Supported now | [Web integration](src/Web/README-INTEGRATION.md) |
+| Embeddings and RAG basics      | Gemini pipeline + Supabase `documents` | Supported now | [Embeddings guide](src/Web/README-EMBEDDINGS.md) |
+| Supabase schema and SQL setup  | Auth + chat history + `pgvector`       | Supported now | [Supabase guide](src/Web/README-SUPABASE.md)     |
+| Privacy and provider tradeoffs | Cloud vs local vs public AI            | Guide only    | [Provider guide](src/Web/README-PROVIDERS.md)    |
 
 ## Quick Start
 
