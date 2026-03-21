@@ -1,5 +1,5 @@
-import type { ChatMode } from '@/services/ai/chat-mode';
-import type { RetrievedDocument } from '@/services/ai/types';
+import type { ChatMode } from '@/types/chat-mode';
+import type { RetrievedDocument } from '@/types/ai';
 
 export interface ChatMessage {
   id: string;

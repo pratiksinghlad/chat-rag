@@ -6,10 +6,10 @@ The app uses Supabase for auth, chat history, and vector search. It uses one AI 
 
 ## Supported Providers Today
 
-| Provider | Type | What it does in this repo |
-| --- | --- | --- |
-| Gemini | Managed cloud | Chat responses and query embeddings in the browser |
-| Ollama | Local runtime | Chat responses and query embeddings from your local machine |
+| Provider | Type          | What it does in this repo                                   |
+| -------- | ------------- | ----------------------------------------------------------- |
+| Gemini   | Managed cloud | Chat responses and query embeddings in the browser          |
+| Ollama   | Local runtime | Chat responses and query embeddings from your local machine |
 
 The ingestion pipeline in [`../EmbeddingPipeline/README.md`](../EmbeddingPipeline/README.md) currently uses Gemini embeddings when indexing documents.
 
@@ -40,15 +40,9 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
 
 VITE_AI_PROVIDER=gemini
-VITE_GEMINI_API_KEY=your-gemini-key
 VITE_GEMINI_CHAT_MODEL=gemini-3-flash-preview
 VITE_GEMINI_EMBEDDING_MODEL=gemini-embedding-001
 ```
-
-Notes:
-
-- `VITE_GEMINI_API_KEY` can be raw or Base64-encoded. The app accepts both, but raw is simpler.
-- Because this is a browser app, restrict your Gemini key to allowed origins before shipping.
 
 ### Option 2: Ollama
 
@@ -72,11 +66,11 @@ ollama serve
 
 ## Chat Modes
 
-| Mode | What it means |
-| --- | --- |
-| `All` | Search the knowledge base first, then let the LLM fill gaps if needed. |
-| `Only knowledge base` | Answer only from retrieved knowledge-base content. |
-| `Only LLM chat` | Skip retrieval and talk directly to the selected model. |
+| Mode                  | What it means                                                          |
+| --------------------- | ---------------------------------------------------------------------- |
+| `All`                 | Search the knowledge base first, then let the LLM fill gaps if needed. |
+| `Only knowledge base` | Answer only from retrieved knowledge-base content.                     |
+| `Only LLM chat`       | Skip retrieval and talk directly to the selected model.                |
 
 ## Current Runtime Flow
 

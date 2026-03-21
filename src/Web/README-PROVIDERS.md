@@ -33,7 +33,9 @@ Important: this repo currently integrates **Gemini** and **Ollama**. The other p
 ### Gemini
 
 - Best when you want a fast cloud setup and minimal local hardware work.
-- In this repo, set `VITE_AI_PROVIDER=gemini` in `src/Web/.env.local`.
+- **Trial / Free Tier**: This project uses the **Google AI Studio** free tier for both embeddings (`gemini-embedding-001`) and chat responses (e.g., `gemini-1.5-flash` or `gemini-3-flash-preview`).
+- In this repo, set `VITE_AI_PROVIDER=gemini` in `src/Web/.env.local` or through your Supabase secrets.
+- Note: Gemini free tier has rate limits, but it's perfect for development and prototyping.
 
 ### Ollama
 

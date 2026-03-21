@@ -1,4 +1,4 @@
-import type { ChatMode } from '@/services/ai/chat-mode';
+import type { ChatMode } from '@/types/chat-mode';
 
 export type AIProvider = 'gemini';
 
@@ -31,12 +31,4 @@ export interface ChatResponse {
   provider: AIProvider;
   contextDocuments?: RetrievedDocument[];
   isGrounded: boolean;
-}
-
-export interface IChatService {
-  getChatResponse(input: ChatRequest): Promise<ChatResponse>;
-}
-
-export interface IEmbeddingService {
-  createEmbedding(input: string | string[]): Promise<number[][]>;
 }

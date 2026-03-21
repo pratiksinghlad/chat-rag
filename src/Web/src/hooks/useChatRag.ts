@@ -2,14 +2,14 @@ import { startTransition, useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useChatHistory } from '@/context/ChatHistoryContext';
-import { createChatService } from '@/services/ai/factory';
+import { supabase } from '@/lib/supabase';
 import {
   buildChatTitle,
   createStoredChatMessage,
   toConversationHistory,
   toUiMessages,
 } from '@/services/chat-history/utils';
-import type { ChatMode } from '@/services/ai/chat-mode';
+import type { ChatMode } from '@/types/chat-mode';
 import type { ChatSessionDetail } from '@/services/chat-history/types';
 import type { ChatMessage } from '@/types/chat';
 
@@ -31,7 +31,6 @@ interface UseChatRagReturn {
   deleteActiveChat: () => Promise<void>;
 }
 
-const chatService = createChatService();
 
 export function useChatRag(): UseChatRagReturn {
   const navigate = useNavigate();
@@ -135,11 +134,24 @@ export function useChatRag(): UseChatRagReturn {
         const history = toConversationHistory(session.messages).slice(0, -1);
         setMessages(toUiMessages(session.messages));
         setIsSendingMessage(true);
-        const response = await chatService.getChatResponse({
-          message: trimmed,
-          history,
-          mode: input.mode,
+        const { data, error: proxyError } = await supabase.functions.invoke('ai-proxy-chat-rag', {
+          body: {
+            action: 'rag-chat',
+            body: {
+              model: import.meta.env.VITE_GEMINI_CHAT_MODEL ?? 'gemini-3-flash-preview',
+              message: trimmed,
+              history,
+              mode: input.mode,
+            },
+          },
         });
+
+        if (proxyError) throw proxyError;
+        
+        const response = {
+          text: data.text || 'No response from proxy',
+          isGrounded: data.isGrounded ?? false,
+        };
 
         const assistantMessage = createStoredChatMessage(
           'assistant',
