@@ -85,13 +85,14 @@ chat-rag/
 
 ## Choose Your Setup
 
-| If you want...                 | Pick this                              | Repo support  | Read next                                        |
-| ------------------------------ | -------------------------------------- | ------------- | ------------------------------------------------ |
-| Fastest cloud demo             | Gemini + Supabase                      | Supported now | [Web integration](src/Web/README-INTEGRATION.md) |
-| Local model inference          | Ollama + Supabase                      | Supported now | [Web integration](src/Web/README-INTEGRATION.md) |
-| Embeddings and RAG basics      | Gemini pipeline + Supabase `documents` | Supported now | [Embeddings guide](src/Web/README-EMBEDDINGS.md) |
-| Supabase schema and SQL setup  | Auth + chat history + `pgvector`       | Supported now | [Supabase guide](src/Web/README-SUPABASE.md)     |
-| Privacy and provider tradeoffs | Cloud vs local vs public AI            | Guide only    | [Provider guide](src/Web/README-PROVIDERS.md)    |
+| If you want...                 | Pick this                              | Repo support  | Read next                                           |
+| ------------------------------ | -------------------------------------- | ------------- | --------------------------------------------------- |
+| Fastest cloud demo             | Gemini + Supabase                      | Supported now | [Web integration](src/Web/README-INTEGRATION.md)    |
+| Local model inference          | Ollama + Supabase                      | Supported now | [Web integration](src/Web/README-INTEGRATION.md)    |
+| Embeddings and RAG basics      | Gemini pipeline + Supabase `documents` | Supported now | [Embeddings guide](src/Web/README-EMBEDDINGS.md)    |
+| Supabase schema and SQL setup  | Auth + chat history + `pgvector`       | Supported now | [Supabase guide](src/Web/README-SUPABASE.md)        |
+| Two-Factor Auth (2FA / TOTP)   | Supabase 2FA or Custom FOSS 2FA        | Supported now | [Supabase 2FA Setup](src/Web/SUPABASE_2FA_SETUP.md) |
+| Privacy and provider tradeoffs | Cloud vs local vs public AI            | Guide only    | [Provider guide](src/Web/README-PROVIDERS.md)       |
 
 ## Quick Start
 
@@ -117,6 +118,7 @@ Use the pipeline when you want to index or re-index documents into Supabase.
 
 ## Read More
 
+- [Supabase 2FA Setup Guide](src/Web/SUPABASE_2FA_SETUP.md)
 - [Web integration and provider setup](src/Web/README-INTEGRATION.md)
 - [Embeddings and RAG, explained simply](src/Web/README-EMBEDDINGS.md)
 - [Supabase and pgvector setup](src/Web/README-SUPABASE.md)
