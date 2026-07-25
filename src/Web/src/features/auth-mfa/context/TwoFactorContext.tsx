@@ -95,6 +95,8 @@ const TwoFactorContext = createContext<TwoFactorContextValue | undefined>(
   undefined
 );
 
+
+
 // ---------------------------------------------------------------------------
 // Provider
 // ---------------------------------------------------------------------------
@@ -322,7 +324,7 @@ export function TwoFactorProvider({ children }: TwoFactorProviderProps) {
 // ---------------------------------------------------------------------------
 // Internal context accessor (used by the hook — not exported for direct use)
 // ---------------------------------------------------------------------------
-
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTwoFactorContext(): TwoFactorContextValue {
   const context = useContext(TwoFactorContext);
   if (context === undefined) {
@@ -334,3 +336,5 @@ export function useTwoFactorContext(): TwoFactorContextValue {
 }
 
 export default TwoFactorContext;
+
+
