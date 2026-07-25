@@ -8,6 +8,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import { AuthProvider } from "@/context/AuthContext";
 import { ChatHistoryProvider } from "@/context/ChatHistoryContext";
+import { TwoFactorProvider } from "@/features/auth-mfa/context/TwoFactorContext";
+import { RequireTwoFactor } from "@/features/auth-mfa/components/RequireTwoFactor";
 import LandingPage from "@/pages/LandingPage";
 import ProfilePage from "@/pages/ProfilePage";
 import ChatRagPage from "@/pages/ChatRagPage";
@@ -21,23 +23,56 @@ function App() {
       <AuthProvider>
         <BrowserRouter basename={import.meta.env.BASE_URL}>
           <ChatHistoryProvider>
-            <Routes>
-              {/* Landing page (login) */}
-              <Route path="/" element={<LandingPage />} />
+            {/* TwoFactorProvider sits inside AuthProvider so it can read the
+                session, and outside individual pages so MFA state persists
+                across route transitions. */}
+            <TwoFactorProvider>
+              <Routes>
+                {/* Landing page (login) — excluded from 2FA guard */}
+                <Route path="/" element={<LandingPage />} />
 
-              {/* Profile page (authenticated) */}
-              <Route path="/profile" element={<ProfilePage />} />
+                {/* Profile page (2FA protected) */}
+                <Route
+                  path="/profile"
+                  element={
+                    <RequireTwoFactor>
+                      <ProfilePage />
+                    </RequireTwoFactor>
+                  }
+                />
 
-              {/* Chat RAG page (authenticated) */}
-              <Route path="/chat" element={<ChatRagPage />} />
-              <Route path="/chat/:chatId" element={<ChatRagPage />} />
+                {/* Chat RAG page (2FA protected) */}
+                <Route
+                  path="/chat"
+                  element={
+                    <RequireTwoFactor>
+                      <ChatRagPage />
+                    </RequireTwoFactor>
+                  }
+                />
+                <Route
+                  path="/chat/:chatId"
+                  element={
+                    <RequireTwoFactor>
+                      <ChatRagPage />
+                    </RequireTwoFactor>
+                  }
+                />
 
-              {/* Knowledge Base Documents page (authenticated) */}
-              <Route path="/documents" element={<KnowledgeBaseDocuments />} />
+                {/* Knowledge Base Documents page (2FA protected) */}
+                <Route
+                  path="/documents"
+                  element={
+                    <RequireTwoFactor>
+                      <KnowledgeBaseDocuments />
+                    </RequireTwoFactor>
+                  }
+                />
 
-              {/* Catch-all redirect */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+                {/* Catch-all redirect */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </TwoFactorProvider>
           </ChatHistoryProvider>
         </BrowserRouter>
       </AuthProvider>
