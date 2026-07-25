@@ -16,12 +16,12 @@ jobs:
         working-directory: src/Web
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 24
           cache: "npm"
           cache-dependency-path: src/Web/package-lock.json
 
@@ -39,5 +39,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./src/Web/buid
+          publish_dir: ./src/Web/build
           cname: ""
